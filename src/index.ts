@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import dbHelper from "./helpers/db.helper";
 import router from "./routers";
-import { SessionCookieType, SessionType } from "./types/session";
 
 dotenv.config();
 
