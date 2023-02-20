@@ -9,12 +9,12 @@ const sessionUser = <object>{};
 const sessionClient = <object>{};
 var intermediateTokenCache = <object>{};
 
-const originName = {
+const originName: OriginNameType = {
   "http://localhost:3000": "client_1",
   "http://localhost:3002": "client_2",
 };
 
-const alloweOrigin = {
+const alloweOrigin: AllowOriginType = {
   "http://localhost:3000": true,
   "http://localhost:3002": true,
 };
@@ -125,6 +125,8 @@ export default {
   intermediateTokenCache,
   originName,
   alloweOrigin,
+  authenticateClient,
+  verifyAuthorizationCode,
   generateAuthorizationCode,
   generateAccessToken,
   storeClientInCache,
