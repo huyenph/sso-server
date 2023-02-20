@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import cors from "cors";
 import dbHelper from "./helpers/db.helper";
 import router from "./routers";
-import { SessionCookieType, SessionType } from "./types/session";
 
 dotenv.config();
 
@@ -50,24 +49,9 @@ app.use("/sso", router);
 app.get("/", (req: Request, res: Response, next: NextFunction) => {
   const user = req.session.user || "unlogged";
   res.render("login", {
-    title: "SSO Server",
+    title: "SSO Server | Sign in",
   });
 });
-
-// Catch 404 and forward to error handler
-// app.use((req: Request, res: Response, next: NextFunction) => {
-//   const err: Error = new Error("Resource Not Found");
-//   next(err);
-// });
-
-// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-//   console.error({
-//     message: err.message,
-//     error: err,
-//   });
-//   const message = err.message || "Internal Server Error";
-//   return res.status(500).json({ message });
-// });
 
 app.listen(port, () => {
   console.log(`App listening on port: ${port}`);
