@@ -20,4 +20,15 @@ const dbConfig = {
         },
     },
 };
-exports.default = { dbConfig };
+const mysqlConfig = {
+    host: process.env.HOST,
+    database: process.env.DB,
+    user: process.env.DB_USER,
+    password: process.env.PASSWORD,
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    queueLimit: 0,
+};
+exports.default = { dbConfig, mysqlConfig };

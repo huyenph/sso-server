@@ -90,6 +90,8 @@ exports.default = {
     intermediateTokenCache,
     originName,
     alloweOrigin,
+    authenticateClient,
+    verifyAuthorizationCode,
     generateAuthorizationCode,
     generateAccessToken,
     storeClientInCache,
