@@ -14,7 +14,6 @@
 /build
 /resources
 /uploads
-/dist
 
 # misc
 .DS_Store

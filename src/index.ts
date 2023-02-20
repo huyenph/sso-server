@@ -4,6 +4,8 @@ import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import dbHelper from "./helpers/db.helper";
+import router from "./routers";
+import { SessionCookieType, SessionType } from "./types/session";
 
 dotenv.config();
 
@@ -26,6 +28,7 @@ if (process.env.NODE_ENV === "production") {
   sessionCookie.secure = true;
 }
 
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(bodyParser.json());
 app.use((_: Request, res: Response, next: NextFunction) => {
@@ -41,6 +44,30 @@ app.use(
   })
 );
 app.use(session(sess));
+app.set("views", __dirname + "/views");
+app.set("view engine", "ejs");
+app.use("/sso", router);
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  const user = req.session.user || "unlogged";
+  res.render("login", {
+    title: "SSO Server",
+  });
+});
+
+// Catch 404 and forward to error handler
+// app.use((req: Request, res: Response, next: NextFunction) => {
+//   const err: Error = new Error("Resource Not Found");
+//   next(err);
+// });
+
+// app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+//   console.error({
+//     message: err.message,
+//     error: err,
+//   });
+//   const message = err.message || "Internal Server Error";
+//   return res.status(500).json({ message });
+// });
 
 app.listen(port, () => {
   console.log(`App listening on port: ${port}`);
