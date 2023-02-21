@@ -39,7 +39,6 @@ const onAuthorize = (req: Request, res: Response, next: NextFunction) => {
 };
 
 const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
-  const user = req.session.user || "unlogged";
   const query = url.parse(req.url, true).query;
   return res.render("login", {
     title: "SSO Server | Sign in",
@@ -49,28 +48,28 @@ const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-const onSignin = (req: Request, res: Response) => {
-  console.log(req.body);
-  const email = req.body.email;
-  const password = req.body.password;
-  const clientId = req.body.client_id;
-  const redirectUrl = req.body.redirect_url;
+const signin = async (req: Request, res: Response) => {
+  const { email, password, clientId, redirectUrl } = req.body;
 
-  // dbHelper.checkCredential(username, password, (user: UserType) => {
-  //   // create global session here
-  //   req.session.user = user;
-  //   (authHelper.sessionUser as any)[user.userId] = user;
-  //   if (redirectUrl === null) {
-  //     return res.redirect("/");
-  //   }
+  if (redirectUrl === null) {
+    return res.redirect("/");
+  }
 
-  //   // create authorization token
-  //   const code = authHelper.generateAuthorizationCode(clientId, redirectUrl);
-  //   authHelper.storeClientInCache(redirectUrl, user.userId, code);
+  dbHelper.checkCredential(email, password, (result: UserType | undefined) => {
+    if (result !== undefined) {
+      // create global session here
+      req.session.user = result;
+      authHelper.sessionUser[result.userID] = result;
 
-  //   // redirect to client with an authorization token
-  //   res.redirect(302, redirectUrl + `?authorization_code=${code}`);
-  // });
+      // create authorization token
+      const code = authHelper.generateAuthorizationCode(clientId, redirectUrl);
+      authHelper.storeClientInCache(redirectUrl, result.userID, code);
+
+      // redirect to client with an authorization token
+      return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+    }
+    return res.status(404).send({ success: false, message: "User not found" });
+  });
 };
 
 const onToken = (req: Request, res: Response) => {
@@ -107,4 +106,4 @@ const onToken = (req: Request, res: Response) => {
   }
 };
 
-export default { onAuthorize, renderLoginView, onSignin, onToken };
+export default { onAuthorize, renderLoginView, signin, onToken };

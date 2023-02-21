@@ -63,11 +63,24 @@ const insertUser = async (
   });
 };
 
-const checkCredential = (
-  username: string,
+const checkCredential = async (
+  email: string,
   password: string,
-  callback: (userType: UserType) => void
-) => {
+  callback: (result: UserType | undefined) => void
+): Promise<any> => {
+  const user = await mysqlDB.users.findOne({ where: { email: email } });
+  if (user !== null) {
+    bcrypt.compare(
+      password,
+      user.password,
+      (_: Error | undefined, isMatch: boolean) => {
+        if (isMatch) {
+          return callback(user);
+        }
+        return callback(undefined);
+      }
+    );
+  }
   // connection.query(
   //   `SELECT * FROM Users WHERE username = "${username}"`,
   //   (err: any, results: any, fields: any) => {

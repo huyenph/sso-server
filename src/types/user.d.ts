@@ -9,8 +9,11 @@ enum UserRole {
 }
 
 type UserType = {
-  userId: string;
+  userID: string;
   username: string;
   email: string;
+  isActive: boolean;
   role: UserRole;
+  createdAt: Date;
+  updatedAt: Date;
 };
