@@ -46,16 +46,23 @@ app.use(session(sess));
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use("/sso", router);
-app.get("/", (req: Request, res: Response, next: NextFunction) => {
-  const user = req.session.user || "unlogged";
-  res.render("login", {
-    title: "SSO Server | Sign in",
-  });
-});
+// app.get("/", (req: Request, res: Response, next: NextFunction) => {
+//   const user = req.session.user || "unlogged";
+//   res.render("login", {
+//     title: "SSO Server | Sign in",
+//   });
+// });
 
 app.listen(port, () => {
   console.log(`App listening on port: ${port}`);
   dbHelper.syncAllModels();
+  dbHelper.insertUser(
+    "Huyen Pham",
+    "123456",
+    "huyenp@gmail.com",
+    true,
+    "admin"
+  );
 });
 
 export default app;

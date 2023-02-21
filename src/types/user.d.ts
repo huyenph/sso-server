@@ -1,8 +1,11 @@
 enum UserRole {
-  "Admin",
-  "Tier1",
-  "Tier2",
-  "Tier3",
+  "admin",
+  "manager",
+  "developer",
+  "finance",
+  "sales",
+  "marketing",
+  "user",
 }
 
 type UserType = {

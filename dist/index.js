@@ -43,14 +43,15 @@ app.use((0, express_session_1.default)(sess));
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use("/sso", routers_1.default);
-app.get("/", (req, res, next) => {
-    const user = req.session.user || "unlogged";
-    res.render("login", {
-        title: "SSO Server | Sign in",
-    });
-});
+// app.get("/", (req: Request, res: Response, next: NextFunction) => {
+//   const user = req.session.user || "unlogged";
+//   res.render("login", {
+//     title: "SSO Server | Sign in",
+//   });
+// });
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
     db_helper_1.default.syncAllModels();
+    db_helper_1.default.insertUser("Huyen Pham", "123456", "huyenp@gmail.com", true, "admin");
 });
 exports.default = app;
