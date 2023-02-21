@@ -3,7 +3,7 @@ import controller from "../controllers";
 
 const router: Router = express.Router();
 
-router.get("/", controller.onInit);
+router.get("/", controller.onAuthorize);
 
 router.get("/authorize", controller.renderLoginView);
 

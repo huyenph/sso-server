@@ -7,7 +7,7 @@ const auth_helper_1 = __importDefault(require("../helpers/auth.helper"));
 const db_helper_1 = __importDefault(require("../helpers/db.helper"));
 const AUTH_HEADER = "authorization";
 const BEARER_AUTH_SCHEME = "bearer";
-const onInit = (req, res, next) => {
+const onAuthorize = (req, res, next) => {
     const query = req.query["redirect_url"];
     try {
         if (typeof query === "string") {
@@ -22,10 +22,10 @@ const onInit = (req, res, next) => {
                     const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, query);
                     auth_helper_1.default.storeClientInCache(query, req.session.user.id, code);
                     // redirect to client with an authorization token
-                    res.redirect(302, query + `?authorization_code=${code}`);
+                    return res.redirect(302, query + `?authorization_code=${code}`);
                 }
                 else {
-                    res.redirect("/oauth/authorize");
+                    return res.redirect("/sso/authorize");
                 }
             }
         }
@@ -79,4 +79,4 @@ const onToken = (req, res) => {
         return res.status(400).send({ message: "Invalid request" });
     }
 };
-exports.default = { onInit, renderLoginView, onSignin, onToken };
+exports.default = { onAuthorize, renderLoginView, onSignin, onToken };

@@ -5,7 +5,7 @@ import dbHelper from "../helpers/db.helper";
 const AUTH_HEADER = "authorization";
 const BEARER_AUTH_SCHEME = "bearer";
 
-const onInit = (req: Request, res: Response, next: NextFunction) => {
+const onAuthorize = (req: Request, res: Response, next: NextFunction) => {
   const query = req.query["redirect_url"];
   try {
     if (typeof query === "string") {
@@ -23,9 +23,9 @@ const onInit = (req: Request, res: Response, next: NextFunction) => {
           );
           authHelper.storeClientInCache(query, req.session.user.id, code);
           // redirect to client with an authorization token
-          res.redirect(302, query + `?authorization_code=${code}`);
+          return res.redirect(302, query + `?authorization_code=${code}`);
         } else {
-          res.redirect("/oauth/authorize");
+          return res.redirect("/sso/authorize");
         }
       }
     }
@@ -99,4 +99,4 @@ const onToken = (req: Request, res: Response) => {
   }
 };
 
-export default { onInit, renderLoginView, onSignin, onToken };
+export default { onAuthorize, renderLoginView, onSignin, onToken };
