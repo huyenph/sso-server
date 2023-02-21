@@ -7,8 +7,8 @@ router.get("/", controller.onAuthorize);
 
 router.get("/authorize", controller.renderLoginView);
 
-router.get("/signin", controller.onSignin);
+router.post("/signin", controller.onSignin);
 
-router.get("/token", controller.onToken);
+router.post("/token", controller.onToken);
 
 export default router;
