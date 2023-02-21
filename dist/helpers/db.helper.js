@@ -58,7 +58,16 @@ const insertUser = (username, password, email, isActive, role) => __awaiter(void
         }));
     });
 });
-const checkCredential = (username, password, callback) => {
+const checkCredential = (email, password, callback) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield mysqlDB.users.findOne({ where: { email: email } });
+    if (user !== null) {
+        bcrypt_1.default.compare(password, user.password, (_, isMatch) => {
+            if (isMatch) {
+                return callback(user);
+            }
+            return callback(undefined);
+        });
+    }
     // connection.query(
     //   `SELECT * FROM Users WHERE username = "${username}"`,
     //   (err: any, results: any, fields: any) => {
@@ -81,7 +90,7 @@ const checkCredential = (username, password, callback) => {
     //     }
     //   }
     // );
-};
+});
 exports.default = {
     mysqlDB,
     authenticate,

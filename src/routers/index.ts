@@ -7,7 +7,7 @@ router.get("/", controller.onAuthorize);
 
 router.get("/authorize", controller.renderLoginView);
 
-router.post("/signin", controller.onSignin);
+router.post("/signin", controller.signin);
 
 router.post("/token", controller.onToken);
 

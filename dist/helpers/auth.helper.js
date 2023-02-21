@@ -7,9 +7,9 @@ const crypto_js_1 = __importDefault(require("crypto-js"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const jwt_helper_1 = require("./jwt.helper");
 dotenv_1.default.config();
-const sessionUser = {};
-const sessionClient = {};
-var intermediateTokenCache = {};
+let sessionUser = {};
+let sessionClient = {};
+let intermediateTokenCache = {};
 const originName = {
     "http://localhost:3000": "client_1",
     "http://localhost:3002": "client_2",
@@ -83,6 +83,8 @@ const storeClientInCache = (redirectUrl, userId, token) => {
         sessionClient[userId] = clients;
     }
     intermediateTokenCache = Object.assign(Object.assign({}, intermediateTokenCache), { [token]: [userId, originName[originUrl]] });
+    console.log(sessionClient);
+    console.log(intermediateTokenCache);
 };
 exports.default = {
     sessionUser,

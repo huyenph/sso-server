@@ -5,9 +5,9 @@ import { genJwtToken } from "./jwt.helper";
 
 dotenv.config();
 
-const sessionUser = <object>{};
-const sessionClient = <object>{};
-var intermediateTokenCache = <object>{};
+let sessionUser: SessionUserType = {};
+let sessionClient: SessionClientType = {};
+let intermediateTokenCache: IntermediateTokenCacheType = {};
 
 const originName: OriginNameType = {
   "http://localhost:3000": "client_1",
@@ -106,17 +106,20 @@ const storeClientInCache = (
   token: string
 ) => {
   const originUrl: string = new URL(redirectUrl).origin;
-  if ((sessionClient as any)[userId] === undefined) {
-    (sessionClient as any)[userId] = [(originName as any)[originUrl]];
+  if (sessionClient[userId] === undefined) {
+    sessionClient[userId] = [originName[originUrl]];
   } else {
-    const clients: object[] = [...(sessionClient as any)[userId]];
-    clients.push((originName as any)[originUrl]);
-    (sessionClient as any)[userId] = clients;
+    const clients: string[] = [...(sessionClient[userId] as string)];
+    clients.push(originName[originUrl]);
+    sessionClient[userId] = clients;
   }
   intermediateTokenCache = {
     ...intermediateTokenCache,
-    [token]: [userId, (originName as any)[originUrl]],
+    [token]: [userId, originName[originUrl]],
   };
+
+  console.log(sessionClient);
+  console.log(intermediateTokenCache);
 };
 
 export default {
