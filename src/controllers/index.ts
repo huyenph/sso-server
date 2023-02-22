@@ -12,7 +12,7 @@ const onAuthorize = (req: Request, res: Response, next: NextFunction) => {
     if (typeof redirectUrl === "string") {
       const originUrl = new URL(redirectUrl).origin;
       if (originUrl) {
-        if (!authHelper.alloweOrigin[originUrl]) {
+        if (!authHelper.allowOrigin[originUrl]) {
           return res
             .status(400)
             .send({ message: "You are not allow to access SSO server" });

@@ -14,7 +14,7 @@ const originName: OriginNameType = {
   "http://localhost:3002": "client_2",
 };
 
-const alloweOrigin: AllowOriginType = {
+const allowOrigin: AllowOriginType = {
   "http://localhost:3000": true,
   "http://localhost:3002": true,
 };
@@ -141,7 +141,7 @@ export default {
   sessionClient,
   intermediateTokenCache,
   originName,
-  alloweOrigin,
+  allowOrigin,
   authenticateClient,
   verifyAuthorizationCode,
   generateAuthorizationCode,
