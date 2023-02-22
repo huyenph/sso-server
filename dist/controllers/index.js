@@ -41,45 +41,16 @@ const db_helper_1 = __importDefault(require("../helpers/db.helper"));
 const AUTH_HEADER = "authorization";
 const BEARER_AUTH_SCHEME = "bearer";
 const onAuthorize = (req, res, next) => {
-    const redirectUrl = req.query["redirect_url"];
-    try {
-        if (typeof redirectUrl === "string") {
-            const originUrl = new URL(redirectUrl).origin;
-            if (originUrl) {
-                if (!auth_helper_1.default.alloweOrigin[originUrl]) {
-                    return res
-                        .status(400)
-                        .send({ message: "You are not allow to access SSO server" });
-                }
-                // if (req.session.user !== undefined) {
-                //   const code = authHelper.generateAuthorizationCode(
-                //     req.session.user.id,
-                //     redirectUrl
-                //   );
-                //   authHelper.storeClientInCache(redirectUrl, req.session.user.id, code);
-                //   // redirect to client with an authorization token
-                //   return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
-                // } else {
-                //   return res.redirect(
-                //     `/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`
-                //   );
-                // }
-                return res.redirect(`/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`);
-            }
-        }
-        return res.status(400).send({ message: "Invalid client" });
-    }
-    catch (error) {
-        return res.status(400).send({ message: error });
-    }
+    console.log(req.session.user);
 };
 const renderLoginView = (req, res, next) => {
     const query = url.parse(req.url, true).query;
+    console.log(query);
     return res.render("login", {
         title: "SSO Server | Sign in",
-        responseType: query["response_type"],
-        clientId: query["client_id"],
-        redirectUrl: query["redirect_url"],
+        responseType: query["responseType"],
+        clientID: query["clientID"],
+        serviceURL: query["serviceURL"],
     });
 };
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

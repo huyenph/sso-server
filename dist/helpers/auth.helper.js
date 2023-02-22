@@ -15,7 +15,7 @@ const originName = {
     "http://localhost:3000": "client_1",
     "http://localhost:3002": "client_2",
 };
-const alloweOrigin = {
+const allowOrigin = {
     "http://localhost:3000": true,
     "http://localhost:3002": true,
 };
@@ -105,7 +105,7 @@ exports.default = {
     sessionClient,
     intermediateTokenCache,
     originName,
-    alloweOrigin,
+    allowOrigin,
     authenticateClient,
     verifyAuthorizationCode,
     generateAuthorizationCode,

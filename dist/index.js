@@ -30,7 +30,6 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());
 app.use(body_parser_1.default.json());
 app.use((_, res, next) => {
-    // res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH");
     res.setHeader("Access-Control-Allow-Headers", "Content-Type");
     next();
@@ -43,12 +42,6 @@ app.use((0, express_session_1.default)(sess));
 app.set("views", __dirname + "/views");
 app.set("view engine", "ejs");
 app.use("/sso", routers_1.default);
-// app.get("/", (req: Request, res: Response, next: NextFunction) => {
-//   const user = req.session.user || "unlogged";
-//   res.render("login", {
-//     title: "SSO Server | Sign in",
-//   });
-// });
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
     db_helper_1.default.syncAllModels();

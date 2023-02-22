@@ -1,9 +1,12 @@
 import express, { Router } from "express";
+import middleware from "../middleware";
 import controller from "../controllers";
 
 const router: Router = express.Router();
 
-router.get("/", controller.onAuthorize);
+router.get("/", middleware.isAuthenticated, controller.onAuthorize);
+
+router.get("/login", middleware.login, controller.renderLoginView);
 
 router.get("/authorize", controller.renderLoginView);
 

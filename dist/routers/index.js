@@ -4,9 +4,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const middleware_1 = __importDefault(require("../middleware"));
 const controllers_1 = __importDefault(require("../controllers"));
 const router = express_1.default.Router();
-router.get("/", controllers_1.default.onAuthorize);
+router.get("/", middleware_1.default.isAuthenticated, controllers_1.default.onAuthorize);
+router.get("/login", middleware_1.default.login, controllers_1.default.renderLoginView);
 router.get("/authorize", controllers_1.default.renderLoginView);
 router.post("/signin", controllers_1.default.signin);
 router.post("/token", controllers_1.default.onGetToken);
