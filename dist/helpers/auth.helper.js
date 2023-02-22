@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const crypto_js_1 = __importDefault(require("crypto-js"));
 const dotenv_1 = __importDefault(require("dotenv"));
-const jwt_helper_1 = require("./jwt.helper");
+const jwt_helper_1 = __importDefault(require("./jwt.helper"));
 dotenv_1.default.config();
 let sessionUser = {};
 let sessionClient = {};
@@ -35,15 +35,18 @@ const authenticateClient = (clientId, clientSecret) => {
     return true;
 };
 const verifyAuthorizationCode = (bearerCode, authCode, clientId, redirectUrl) => {
+    if (authCode === undefined) {
+        return false;
+    }
     const ssoCode = authCode.replace(/\s/g, "+");
     const clientName = intermediateTokenCache[ssoCode][1];
     const globalSessionToken = intermediateTokenCache[ssoCode][0];
-    // console.log(bearerCode);
-    // console.log((appTokenDB as any)[clientName]);
     if (bearerCode.replace("Bearer ", "") !== appTokenDB[clientName]) {
+        console.log(bearerCode.replace("Bearer ", ""));
+        console.log(appTokenDB[clientName]);
         return false;
     }
-    if (authCode === undefined) {
+    if (sessionClient === undefined) {
         return false;
     }
     if (!sessionClient[globalSessionToken].includes(clientName)) {
@@ -51,6 +54,7 @@ const verifyAuthorizationCode = (bearerCode, authCode, clientId, redirectUrl) =>
     }
     const authData = JSON.parse(crypto_js_1.default.AES.decrypt(ssoCode, secretKey).toString(crypto_js_1.default.enc.Utf8));
     if (authData) {
+        console.log(`authData: ${authData}`);
         const { client_id, redirect_url, exp } = authData;
         if (clientId !== client_id || redirect_url !== redirectUrl) {
             return false;
@@ -66,11 +70,26 @@ const generateAccessToken = (authCode, clientId, clientSecret) => {
     const ssoCode = authCode.replace(/\s/g, "+");
     const globalSessionToken = intermediateTokenCache[ssoCode][0];
     const userInfo = sessionUser[globalSessionToken];
-    return (0, jwt_helper_1.genJwtToken)({
+    // return jwt.sign(
+    //   {
+    //     client_id: clientId,
+    //     client_secret: clientSecret,
+    //     user: userInfo,
+    //   },
+    //   privateCert,
+    //   {
+    //     algorithm: "RS256",
+    //     expiresIn: "1h",
+    //     issuer: "sso-server",
+    //   }
+    // );
+    const token = jwt_helper_1.default.genJwtToken({
         client_id: clientId,
         client_secret: clientSecret,
         user: userInfo,
     });
+    console.log(token);
+    // return token;
 };
 const storeClientInCache = (redirectUrl, userId, token) => {
     const originUrl = new URL(redirectUrl).origin;
@@ -83,8 +102,6 @@ const storeClientInCache = (redirectUrl, userId, token) => {
         sessionClient[userId] = clients;
     }
     intermediateTokenCache = Object.assign(Object.assign({}, intermediateTokenCache), { [token]: [userId, originName[originUrl]] });
-    console.log(sessionClient);
-    console.log(intermediateTokenCache);
 };
 exports.default = {
     sessionUser,

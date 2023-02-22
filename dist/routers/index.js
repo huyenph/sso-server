@@ -9,5 +9,5 @@ const router = express_1.default.Router();
 router.get("/", controllers_1.default.onAuthorize);
 router.get("/authorize", controllers_1.default.renderLoginView);
 router.post("/signin", controllers_1.default.signin);
-router.post("/token", controllers_1.default.onToken);
+router.post("/token", controllers_1.default.onGetToken);
 exports.default = router;
