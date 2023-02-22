@@ -29,8 +29,8 @@ const secretKey = process.env.SECRET_KEY || "up9E5FC6TIwBDHadHAcLA7M3XeilqRfa";
 const generateAuthorizationCode = (clientId: string, redirectUrl: string) => {
   return CryptoJS.AES.encrypt(
     JSON.stringify({
-      client_id: clientId,
-      redirect_url: redirectUrl,
+      clientID: clientId,
+      serviceURL: redirectUrl,
       exp: Date.now() + 600,
     }),
     secretKey
@@ -46,7 +46,7 @@ const verifyAuthorizationCode = (
   bearerCode: string,
   authCode: string,
   clientId: string,
-  redirectUrl: string
+  serviceUrl: string
 ) => {
   if (authCode === undefined) {
     return false;
@@ -57,8 +57,6 @@ const verifyAuthorizationCode = (
   const globalSessionToken: string = intermediateTokenCache[ssoCode][0];
 
   if (bearerCode.replace("Bearer ", "") !== appTokenDB[clientName]) {
-    console.log(bearerCode.replace("Bearer ", ""));
-    console.log(appTokenDB[clientName]);
     return false;
   }
 
@@ -74,9 +72,8 @@ const verifyAuthorizationCode = (
     CryptoJS.AES.decrypt(ssoCode, secretKey).toString(CryptoJS.enc.Utf8)
   );
   if (authData) {
-    console.log(`authData: ${authData}`);
-    const { client_id, redirect_url, exp } = authData;
-    if (clientId !== client_id || redirect_url !== redirectUrl) {
+    const { clientID, serviceURL, exp } = authData;
+    if (clientId !== clientID || serviceURL !== serviceUrl) {
       return false;
     }
     if (exp < Date.now()) {
@@ -97,8 +94,8 @@ const generateAccessToken = (
   const userInfo: UserType = sessionUser[globalSessionToken];
   return jwt.sign(
     {
-      client_id: clientId,
-      client_secret: clientSecret,
+      clientID: clientId,
+      clientSecret: clientSecret,
       user: userInfo,
     },
     privateCert,

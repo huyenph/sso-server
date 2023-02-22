@@ -1,13 +1,14 @@
 import express, { Router } from "express";
+import middleware from "../middleware";
 import controller from "../controllers";
 
 const router: Router = express.Router();
 
-router.get("/", controller.onAuthorize);
+router.get("/", middleware.isAuthenticated, controller.onAuthorized);
 
-router.get("/authorize", controller.renderLoginView);
+router.get("/login", middleware.login, controller.renderLoginView);
 
-router.post("/signin", controller.signin);
+router.post("/authorize", controller.onLogin);
 
 router.post("/token", controller.onGetToken);
 

@@ -3,41 +3,20 @@ import * as url from "url";
 import authHelper from "../helpers/auth.helper";
 import dbHelper from "../helpers/db.helper";
 
-const AUTH_HEADER = "authorization";
-const BEARER_AUTH_SCHEME = "bearer";
+const onAuthorized = (req: Request, res: Response, next: NextFunction) => {
+  const serviceURL = req.query["serviceURL"] as string;
+  if (serviceURL === null || serviceURL === undefined) {
+    return res.redirect("/");
+  }
 
-const onAuthorize = (req: Request, res: Response, next: NextFunction) => {
-  const redirectUrl = req.query["redirect_url"];
-  try {
-    if (typeof redirectUrl === "string") {
-      const originUrl = new URL(redirectUrl).origin;
-      if (originUrl) {
-        if (!authHelper.allowOrigin[originUrl]) {
-          return res
-            .status(400)
-            .send({ message: "You are not allow to access SSO server" });
-        }
-        // if (req.session.user !== undefined) {
-        //   const code = authHelper.generateAuthorizationCode(
-        //     req.session.user.id,
-        //     redirectUrl
-        //   );
-        //   authHelper.storeClientInCache(redirectUrl, req.session.user.id, code);
-        //   // redirect to client with an authorization token
-        //   return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
-        // } else {
-        //   return res.redirect(
-        //     `/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`
-        //   );
-        // }
-        return res.redirect(
-          `/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`
-        );
-      }
-    }
-    return res.status(400).send({ message: "Invalid client" });
-  } catch (error) {
-    return res.status(400).send({ message: error });
+  if (req.session.user !== undefined) {
+    const code = authHelper.generateAuthorizationCode(
+      req.session.user.id,
+      serviceURL
+    );
+    authHelper.storeClientInCache(serviceURL, req.session.user.id, code);
+    // redirect to client with an authorization token
+    return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
   }
 };
 
@@ -45,17 +24,17 @@ const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
   const query = url.parse(req.url, true).query;
   return res.render("login", {
     title: "SSO Server | Sign in",
-    responseType: query["response_type"],
-    clientId: query["client_id"],
-    redirectUrl: query["redirect_url"],
+    responseType: query["responseType"],
+    clientID: query["clientID"],
+    serviceURL: query["serviceURL"],
   });
 };
 
-const signin = async (req: Request, res: Response) => {
+const onLogin = async (req: Request, res: Response) => {
   if (req.body) {
-    const { email, password, clientId, redirectUrl } = req.body;
+    const { email, password, clientID, serviceURL } = req.body;
 
-    if (redirectUrl === null) {
+    if (serviceURL === null) {
       return res.redirect("/");
     }
 
@@ -70,56 +49,57 @@ const signin = async (req: Request, res: Response) => {
 
           // create authorization token
           const code = authHelper.generateAuthorizationCode(
-            clientId,
-            redirectUrl
+            clientID,
+            serviceURL
           );
-          authHelper.storeClientInCache(redirectUrl, result.userID, code);
+          authHelper.storeClientInCache(serviceURL, result.userID, code);
 
           // redirect to client with an authorization token
-          return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+          return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
+        } else {
+          return res
+            .status(404)
+            .send({ success: false, message: "User not found" });
         }
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found" });
       }
     );
   } else {
-    return res.status(404).send({ success: false, message: "User not found" });
+    return res.redirect("/");
   }
 };
 
-const onGetToken = async (req: Request, res: Response) => {
+const onGetToken = (req: Request, res: Response) => {
+  console.log(req.body);
   if (req.body) {
-    const { authorization_code, client_id, client_secret, redirect_url } =
-      req.body;
+    const { authorizationCode, clientID, clientSecret, serviceURL } = req.body;
 
-    if (!authHelper.authenticateClient(client_id, client_secret)) {
+    if (!authHelper.authenticateClient(clientID, clientSecret)) {
       return res.status(400).send({ message: "Invalid client" });
     }
 
     if (
       !authHelper.verifyAuthorizationCode(
         req.get("Authorization")!,
-        authorization_code,
-        client_id,
-        redirect_url
+        authorizationCode,
+        clientID,
+        serviceURL
       )
     ) {
       return res.status(400).send({ message: "Access denied" });
     }
 
-    const token = await authHelper.generateAccessToken(
-      authorization_code,
-      client_id,
-      client_secret
+    const token = authHelper.generateAccessToken(
+      authorizationCode,
+      clientID,
+      clientSecret
     );
     res.status(200).send({
-      access_token: token,
-      token_type: "JWT",
+      accessToken: token,
+      tokenType: "JWT",
     });
   } else {
     return res.status(400).send({ message: "Invalid request" });
   }
 };
 
-export default { onAuthorize, renderLoginView, signin, onGetToken };
+export default { onAuthorized, renderLoginView, onLogin, onGetToken };
