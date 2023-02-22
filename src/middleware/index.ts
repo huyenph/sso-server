@@ -36,9 +36,10 @@ const login = (req: Request, res: Response, next: NextFunction) => {
           return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
         }
         next();
+      } else {
+        return res.redirect("/");
       }
     }
-    return res.redirect("/");
   } catch (error) {
     return res.redirect("/");
   }
