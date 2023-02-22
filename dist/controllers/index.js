@@ -124,7 +124,6 @@ const onGetToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     else {
-        console.log("error here");
         return res.status(400).send({ message: "Invalid request" });
     }
 });

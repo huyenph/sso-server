@@ -118,7 +118,6 @@ const onGetToken = async (req: Request, res: Response) => {
       token_type: "JWT",
     });
   } else {
-    console.log("error here");
     return res.status(400).send({ message: "Invalid request" });
   }
 };
