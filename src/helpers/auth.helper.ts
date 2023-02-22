@@ -1,7 +1,9 @@
 import CryptoJS from "crypto-js";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import { genJwtToken } from "./jwt.helper";
+import jwt from "jsonwebtoken";
+import jwtHelper from "./jwt.helper";
+import { privateCert } from "../configs/keys";
 
 dotenv.config();
 
@@ -19,7 +21,7 @@ const alloweOrigin: AllowOriginType = {
   "http://localhost:3002": true,
 };
 
-const appTokenDB = {
+const appTokenDB: AppTokenDBType = {
   client_1: "l1Q7zkOL59cRqWBkQ12ZiGVW2DBL",
   client_2: "1g0jJwGmRQhJwvwNOrY4i90kD0m",
 };
@@ -48,22 +50,25 @@ const verifyAuthorizationCode = (
   clientId: string,
   redirectUrl: string
 ) => {
-  const ssoCode = authCode.replace(/\s/g, "+");
-  const clientName = (intermediateTokenCache as any)[ssoCode][1];
-  const globalSessionToken = (intermediateTokenCache as any)[ssoCode][0];
-
-  // console.log(bearerCode);
-  // console.log((appTokenDB as any)[clientName]);
-
-  if (bearerCode.replace("Bearer ", "") !== (appTokenDB as any)[clientName]) {
-    return false;
-  }
-
   if (authCode === undefined) {
     return false;
   }
 
-  if (!(sessionClient as any)[globalSessionToken].includes(clientName)) {
+  const ssoCode: string = authCode.replace(/\s/g, "+");
+  const clientName: string = intermediateTokenCache[ssoCode][1];
+  const globalSessionToken: string = intermediateTokenCache[ssoCode][0];
+
+  if (bearerCode.replace("Bearer ", "") !== appTokenDB[clientName]) {
+    console.log(bearerCode.replace("Bearer ", ""));
+    console.log(appTokenDB[clientName]);
+    return false;
+  }
+
+  if (sessionClient === undefined) {
+    return false;
+  }
+
+  if (!sessionClient[globalSessionToken]!.includes(clientName)) {
     return false;
   }
 
@@ -71,6 +76,7 @@ const verifyAuthorizationCode = (
     CryptoJS.AES.decrypt(ssoCode, secretKey).toString(CryptoJS.enc.Utf8)
   );
   if (authData) {
+    console.log(`authData: ${authData}`);
     const { client_id, redirect_url, exp } = authData;
     if (clientId !== client_id || redirect_url !== redirectUrl) {
       return false;
@@ -89,15 +95,28 @@ const generateAccessToken = (
   clientSecret: string
 ) => {
   const ssoCode: string = authCode.replace(/\s/g, "+");
-  const globalSessionToken: string = (intermediateTokenCache as any)[
-    ssoCode
-  ][0];
-  const userInfo: UserType = (sessionUser as any)[globalSessionToken];
-  return genJwtToken({
+  const globalSessionToken: string = intermediateTokenCache[ssoCode][0];
+  const userInfo: UserType = sessionUser[globalSessionToken];
+  // return jwt.sign(
+  //   {
+  //     client_id: clientId,
+  //     client_secret: clientSecret,
+  //     user: userInfo,
+  //   },
+  //   privateCert,
+  //   {
+  //     algorithm: "RS256",
+  //     expiresIn: "1h",
+  //     issuer: "sso-server",
+  //   }
+  // );
+  const token = jwtHelper.genJwtToken({
     client_id: clientId,
     client_secret: clientSecret,
     user: userInfo,
   });
+  console.log(token);
+  // return token;
 };
 
 const storeClientInCache = (
@@ -117,9 +136,6 @@ const storeClientInCache = (
     ...intermediateTokenCache,
     [token]: [userId, originName[originUrl]],
   };
-
-  console.log(sessionClient);
-  console.log(intermediateTokenCache);
 };
 
 export default {

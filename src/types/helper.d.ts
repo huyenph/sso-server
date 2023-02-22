@@ -17,3 +17,7 @@ type SessionClientType = {
 type IntermediateTokenCacheType = {
   [key: string]: string[];
 };
+
+type AppTokenDBType = {
+  [key: string]: string;
+};

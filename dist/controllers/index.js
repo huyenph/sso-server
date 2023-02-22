@@ -51,15 +51,20 @@ const onAuthorize = (req, res, next) => {
                         .status(400)
                         .send({ message: "You are not allow to access SSO server" });
                 }
-                if (req.session.user !== undefined) {
-                    const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, redirectUrl);
-                    auth_helper_1.default.storeClientInCache(redirectUrl, req.session.user.id, code);
-                    // redirect to client with an authorization token
-                    return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
-                }
-                else {
-                    return res.redirect(`/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`);
-                }
+                // if (req.session.user !== undefined) {
+                //   const code = authHelper.generateAuthorizationCode(
+                //     req.session.user.id,
+                //     redirectUrl
+                //   );
+                //   authHelper.storeClientInCache(redirectUrl, req.session.user.id, code);
+                //   // redirect to client with an authorization token
+                //   return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+                // } else {
+                //   return res.redirect(
+                //     `/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`
+                //   );
+                // }
+                return res.redirect(`/sso/authorize?response_type=${req.query["response_type"]}&client_id=${req.query["client_id"]}&redirect_url=${redirectUrl}`);
             }
         }
         return res.status(400).send({ message: "Invalid client" });
@@ -78,28 +83,32 @@ const renderLoginView = (req, res, next) => {
     });
 };
 const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, password, clientId, redirectUrl } = req.body;
-    console.log(req.body);
-    if (redirectUrl === null) {
-        return res.redirect("/");
-    }
-    db_helper_1.default.checkCredential(email, password, (result) => {
-        if (result !== undefined) {
-            // create global session here
-            req.session.user = result;
-            auth_helper_1.default.sessionUser[result.userID] = result;
-            // create authorization token
-            const code = auth_helper_1.default.generateAuthorizationCode(clientId, redirectUrl);
-            console.log(`redirectUrl: ${redirectUrl}`);
-            auth_helper_1.default.storeClientInCache(redirectUrl, result.userID, code);
-            // redirect to client with an authorization token
-            return;
-            // return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+    if (req.body) {
+        const { email, password, clientId, redirectUrl } = req.body;
+        if (redirectUrl === null) {
+            return res.redirect("/");
         }
+        db_helper_1.default.checkCredential(email, password, (result) => {
+            if (result !== undefined) {
+                // create global session here
+                req.session.user = result;
+                auth_helper_1.default.sessionUser[result.userID] = result;
+                // create authorization token
+                const code = auth_helper_1.default.generateAuthorizationCode(clientId, redirectUrl);
+                auth_helper_1.default.storeClientInCache(redirectUrl, result.userID, code);
+                // redirect to client with an authorization token
+                return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+            }
+            return res
+                .status(404)
+                .send({ success: false, message: "User not found" });
+        });
+    }
+    else {
         return res.status(404).send({ success: false, message: "User not found" });
-    });
+    }
 });
-const onToken = (req, res) => {
+const onGetToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.body) {
         const { authorization_code, client_id, client_secret, redirect_url } = req.body;
         if (!auth_helper_1.default.authenticateClient(client_id, client_secret)) {
@@ -108,14 +117,15 @@ const onToken = (req, res) => {
         if (!auth_helper_1.default.verifyAuthorizationCode(req.get("Authorization"), authorization_code, client_id, redirect_url)) {
             return res.status(400).send({ message: "Access denied" });
         }
-        const token = auth_helper_1.default.generateAccessToken(authorization_code, client_id, client_secret);
-        return res.status(200).send({
+        const token = yield auth_helper_1.default.generateAccessToken(authorization_code, client_id, client_secret);
+        res.status(200).send({
             access_token: token,
             token_type: "JWT",
         });
     }
     else {
+        console.log("error here");
         return res.status(400).send({ message: "Invalid request" });
     }
-};
-exports.default = { onAuthorize, renderLoginView, signin, onToken };
+});
+exports.default = { onAuthorize, renderLoginView, signin, onGetToken };

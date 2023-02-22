@@ -6,6 +6,5 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.privateCert = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const privateKeyPath = process.env.JWT_PRIVATE_KEY_FILE ||
-    path_1.default.resolve(__dirname, "./jwtPrivate.pem");
+const privateKeyPath = process.env.JWT_PRIVATE_KEY_FILE || path_1.default.resolve(__dirname, "./jwtRS256.key");
 exports.privateCert = fs_1.default.readFileSync(privateKeyPath);

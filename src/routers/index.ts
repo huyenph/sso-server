@@ -9,6 +9,6 @@ router.get("/authorize", controller.renderLoginView);
 
 router.post("/signin", controller.signin);
 
-router.post("/token", controller.onToken);
+router.post("/token", controller.onGetToken);
 
 export default router;
