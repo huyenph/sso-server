@@ -17,25 +17,23 @@ const login = (req, res, next) => {
         return res.redirect("/");
     }
     try {
-        if (typeof serviceURL === "string") {
-            const originUrl = new URL(serviceURL).origin;
-            if (originUrl) {
-                if (!auth_helper_1.default.allowOrigin[originUrl]) {
-                    return res
-                        .status(400)
-                        .send({ message: "You are not allow to access SSO-Server" });
-                }
-                if (req.session.user !== undefined) {
-                    const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, serviceURL);
-                    auth_helper_1.default.storeClientInCache(serviceURL, req.session.user.id, code);
-                    // redirect to client with an authorization token
-                    return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
-                }
-                next();
+        const originUrl = new URL(serviceURL).origin;
+        if (originUrl) {
+            if (!auth_helper_1.default.allowOrigin[originUrl]) {
+                return res
+                    .status(400)
+                    .send({ message: "You are not allow to access SSO-Server" });
             }
-            else {
-                return res.redirect("/");
+            if (req.session.user !== undefined) {
+                const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, serviceURL);
+                auth_helper_1.default.storeClientInCache(serviceURL, req.session.user.id, code);
+                // redirect to client with an authorization token
+                return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
             }
+            next();
+        }
+        else {
+            return res.redirect("/");
         }
     }
     catch (error) {

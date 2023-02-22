@@ -38,10 +38,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const url = __importStar(require("url"));
 const auth_helper_1 = __importDefault(require("../helpers/auth.helper"));
 const db_helper_1 = __importDefault(require("../helpers/db.helper"));
-const AUTH_HEADER = "authorization";
-const BEARER_AUTH_SCHEME = "bearer";
 const onAuthorized = (req, res, next) => {
-    console.log(req.session.user);
+    const serviceURL = req.query["serviceURL"];
+    if (serviceURL === null || serviceURL === undefined) {
+        return res.redirect("/");
+    }
+    if (req.session.user !== undefined) {
+        const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, serviceURL);
+        auth_helper_1.default.storeClientInCache(serviceURL, req.session.user.id, code);
+        // redirect to client with an authorization token
+        return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
+    }
 };
 const renderLoginView = (req, res, next) => {
     const query = url.parse(req.url, true).query;
@@ -80,23 +87,24 @@ const onLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.redirect("/");
     }
 });
-const onGetToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const onGetToken = (req, res) => {
+    console.log(req.body);
     if (req.body) {
-        const { authorization_code, client_id, client_secret, redirect_url } = req.body;
-        if (!auth_helper_1.default.authenticateClient(client_id, client_secret)) {
+        const { authorizationCode, clientID, clientSecret, serviceURL } = req.body;
+        if (!auth_helper_1.default.authenticateClient(clientID, clientSecret)) {
             return res.status(400).send({ message: "Invalid client" });
         }
-        if (!auth_helper_1.default.verifyAuthorizationCode(req.get("Authorization"), authorization_code, client_id, redirect_url)) {
+        if (!auth_helper_1.default.verifyAuthorizationCode(req.get("Authorization"), authorizationCode, clientID, serviceURL)) {
             return res.status(400).send({ message: "Access denied" });
         }
-        const token = yield auth_helper_1.default.generateAccessToken(authorization_code, client_id, client_secret);
+        const token = auth_helper_1.default.generateAccessToken(authorizationCode, clientID, clientSecret);
         res.status(200).send({
-            access_token: token,
-            token_type: "JWT",
+            accessToken: token,
+            tokenType: "JWT",
         });
     }
     else {
         return res.status(400).send({ message: "Invalid request" });
     }
-});
+};
 exports.default = { onAuthorized, renderLoginView, onLogin, onGetToken };

@@ -26,8 +26,8 @@ const appTokenDB = {
 const secretKey = process.env.SECRET_KEY || "up9E5FC6TIwBDHadHAcLA7M3XeilqRfa";
 const generateAuthorizationCode = (clientId, redirectUrl) => {
     return crypto_js_1.default.AES.encrypt(JSON.stringify({
-        client_id: clientId,
-        redirect_url: redirectUrl,
+        clientID: clientId,
+        serviceURL: redirectUrl,
         exp: Date.now() + 600,
     }), secretKey).toString();
 };
@@ -35,7 +35,7 @@ const authenticateClient = (clientId, clientSecret) => {
     // check credential here
     return true;
 };
-const verifyAuthorizationCode = (bearerCode, authCode, clientId, redirectUrl) => {
+const verifyAuthorizationCode = (bearerCode, authCode, clientId, serviceUrl) => {
     if (authCode === undefined) {
         return false;
     }
@@ -43,8 +43,6 @@ const verifyAuthorizationCode = (bearerCode, authCode, clientId, redirectUrl) =>
     const clientName = intermediateTokenCache[ssoCode][1];
     const globalSessionToken = intermediateTokenCache[ssoCode][0];
     if (bearerCode.replace("Bearer ", "") !== appTokenDB[clientName]) {
-        console.log(bearerCode.replace("Bearer ", ""));
-        console.log(appTokenDB[clientName]);
         return false;
     }
     if (sessionClient === undefined) {
@@ -55,9 +53,8 @@ const verifyAuthorizationCode = (bearerCode, authCode, clientId, redirectUrl) =>
     }
     const authData = JSON.parse(crypto_js_1.default.AES.decrypt(ssoCode, secretKey).toString(crypto_js_1.default.enc.Utf8));
     if (authData) {
-        console.log(`authData: ${authData}`);
-        const { client_id, redirect_url, exp } = authData;
-        if (clientId !== client_id || redirect_url !== redirectUrl) {
+        const { clientID, serviceURL, exp } = authData;
+        if (clientId !== clientID || serviceURL !== serviceUrl) {
             return false;
         }
         if (exp < Date.now()) {
@@ -72,8 +69,8 @@ const generateAccessToken = (authCode, clientId, clientSecret) => {
     const globalSessionToken = intermediateTokenCache[ssoCode][0];
     const userInfo = sessionUser[globalSessionToken];
     return jsonwebtoken_1.default.sign({
-        client_id: clientId,
-        client_secret: clientSecret,
+        clientID: clientId,
+        clientSecret: clientSecret,
         user: userInfo,
     }, keys_1.privateCert, {
         algorithm: "RS256",

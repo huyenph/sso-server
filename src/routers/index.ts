@@ -8,7 +8,7 @@ router.get("/", middleware.isAuthenticated, controller.onAuthorized);
 
 router.get("/login", middleware.login, controller.renderLoginView);
 
-router.get("/authorize", controller.onLogin);
+router.post("/authorize", controller.onLogin);
 
 router.post("/token", controller.onGetToken);
 

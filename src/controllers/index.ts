@@ -3,11 +3,21 @@ import * as url from "url";
 import authHelper from "../helpers/auth.helper";
 import dbHelper from "../helpers/db.helper";
 
-const AUTH_HEADER = "authorization";
-const BEARER_AUTH_SCHEME = "bearer";
-
 const onAuthorized = (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.session.user);
+  const serviceURL = req.query["serviceURL"] as string;
+  if (serviceURL === null || serviceURL === undefined) {
+    return res.redirect("/");
+  }
+
+  if (req.session.user !== undefined) {
+    const code = authHelper.generateAuthorizationCode(
+      req.session.user.id,
+      serviceURL
+    );
+    authHelper.storeClientInCache(serviceURL, req.session.user.id, code);
+    // redirect to client with an authorization token
+    return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
+  }
 };
 
 const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
@@ -58,34 +68,34 @@ const onLogin = async (req: Request, res: Response) => {
   }
 };
 
-const onGetToken = async (req: Request, res: Response) => {
+const onGetToken = (req: Request, res: Response) => {
+  console.log(req.body);
   if (req.body) {
-    const { authorization_code, client_id, client_secret, redirect_url } =
-      req.body;
+    const { authorizationCode, clientID, clientSecret, serviceURL } = req.body;
 
-    if (!authHelper.authenticateClient(client_id, client_secret)) {
+    if (!authHelper.authenticateClient(clientID, clientSecret)) {
       return res.status(400).send({ message: "Invalid client" });
     }
 
     if (
       !authHelper.verifyAuthorizationCode(
         req.get("Authorization")!,
-        authorization_code,
-        client_id,
-        redirect_url
+        authorizationCode,
+        clientID,
+        serviceURL
       )
     ) {
       return res.status(400).send({ message: "Access denied" });
     }
 
-    const token = await authHelper.generateAccessToken(
-      authorization_code,
-      client_id,
-      client_secret
+    const token = authHelper.generateAccessToken(
+      authorizationCode,
+      clientID,
+      clientSecret
     );
     res.status(200).send({
-      access_token: token,
-      token_type: "JWT",
+      accessToken: token,
+      tokenType: "JWT",
     });
   } else {
     return res.status(400).send({ message: "Invalid request" });

@@ -9,6 +9,6 @@ const controllers_1 = __importDefault(require("../controllers"));
 const router = express_1.default.Router();
 router.get("/", middleware_1.default.isAuthenticated, controllers_1.default.onAuthorized);
 router.get("/login", middleware_1.default.login, controllers_1.default.renderLoginView);
-router.get("/authorize", controllers_1.default.onLogin);
+router.post("/authorize", controllers_1.default.onLogin);
 router.post("/token", controllers_1.default.onGetToken);
 exports.default = router;
