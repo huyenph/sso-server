@@ -1,8 +1,6 @@
 import CryptoJS from "crypto-js";
-import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-import jwtHelper from "./jwt.helper";
 import { privateCert } from "../configs/keys";
 
 dotenv.config();
@@ -16,7 +14,7 @@ const originName: OriginNameType = {
   "http://localhost:3002": "client_2",
 };
 
-const alloweOrigin: AllowOriginType = {
+const allowOrigin: AllowOriginType = {
   "http://localhost:3000": true,
   "http://localhost:3002": true,
 };
@@ -97,25 +95,25 @@ const generateAccessToken = (
   const ssoCode: string = authCode.replace(/\s/g, "+");
   const globalSessionToken: string = intermediateTokenCache[ssoCode][0];
   const userInfo: UserType = sessionUser[globalSessionToken];
-  // return jwt.sign(
-  //   {
-  //     client_id: clientId,
-  //     client_secret: clientSecret,
-  //     user: userInfo,
-  //   },
-  //   privateCert,
-  //   {
-  //     algorithm: "RS256",
-  //     expiresIn: "1h",
-  //     issuer: "sso-server",
-  //   }
-  // );
-  const token = jwtHelper.genJwtToken({
-    client_id: clientId,
-    client_secret: clientSecret,
-    user: userInfo,
-  });
-  console.log(token);
+  return jwt.sign(
+    {
+      client_id: clientId,
+      client_secret: clientSecret,
+      user: userInfo,
+    },
+    privateCert,
+    {
+      algorithm: "RS256",
+      expiresIn: "1h",
+      issuer: "sso-server",
+    }
+  );
+  // const token = jwtHelper.genJwtToken({
+  //   client_id: clientId,
+  //   client_secret: clientSecret,
+  //   user: userInfo,
+  // });
+  // console.log(token);
   // return token;
 };
 
@@ -143,7 +141,7 @@ export default {
   sessionClient,
   intermediateTokenCache,
   originName,
-  alloweOrigin,
+  allowOrigin,
   authenticateClient,
   verifyAuthorizationCode,
   generateAuthorizationCode,
