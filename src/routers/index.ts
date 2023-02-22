@@ -4,13 +4,11 @@ import controller from "../controllers";
 
 const router: Router = express.Router();
 
-router.get("/", middleware.isAuthenticated, controller.onAuthorize);
+router.get("/", middleware.isAuthenticated, controller.onAuthorized);
 
 router.get("/login", middleware.login, controller.renderLoginView);
 
-router.get("/authorize", controller.renderLoginView);
-
-router.post("/signin", controller.signin);
+router.get("/authorize", controller.onLogin);
 
 router.post("/token", controller.onGetToken);
 

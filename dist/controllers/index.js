@@ -40,12 +40,11 @@ const auth_helper_1 = __importDefault(require("../helpers/auth.helper"));
 const db_helper_1 = __importDefault(require("../helpers/db.helper"));
 const AUTH_HEADER = "authorization";
 const BEARER_AUTH_SCHEME = "bearer";
-const onAuthorize = (req, res, next) => {
+const onAuthorized = (req, res, next) => {
     console.log(req.session.user);
 };
 const renderLoginView = (req, res, next) => {
     const query = url.parse(req.url, true).query;
-    console.log(query);
     return res.render("login", {
         title: "SSO Server | Sign in",
         responseType: query["responseType"],
@@ -53,10 +52,10 @@ const renderLoginView = (req, res, next) => {
         serviceURL: query["serviceURL"],
     });
 };
-const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const onLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.body) {
-        const { email, password, clientId, redirectUrl } = req.body;
-        if (redirectUrl === null) {
+        const { email, password, clientID, serviceURL } = req.body;
+        if (serviceURL === null) {
             return res.redirect("/");
         }
         db_helper_1.default.checkCredential(email, password, (result) => {
@@ -65,18 +64,20 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 req.session.user = result;
                 auth_helper_1.default.sessionUser[result.userID] = result;
                 // create authorization token
-                const code = auth_helper_1.default.generateAuthorizationCode(clientId, redirectUrl);
-                auth_helper_1.default.storeClientInCache(redirectUrl, result.userID, code);
+                const code = auth_helper_1.default.generateAuthorizationCode(clientID, serviceURL);
+                auth_helper_1.default.storeClientInCache(serviceURL, result.userID, code);
                 // redirect to client with an authorization token
-                return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+                return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
             }
-            return res
-                .status(404)
-                .send({ success: false, message: "User not found" });
+            else {
+                return res
+                    .status(404)
+                    .send({ success: false, message: "User not found" });
+            }
         });
     }
     else {
-        return res.status(404).send({ success: false, message: "User not found" });
+        return res.redirect("/");
     }
 });
 const onGetToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -98,4 +99,4 @@ const onGetToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         return res.status(400).send({ message: "Invalid request" });
     }
 });
-exports.default = { onAuthorize, renderLoginView, signin, onGetToken };
+exports.default = { onAuthorized, renderLoginView, onLogin, onGetToken };

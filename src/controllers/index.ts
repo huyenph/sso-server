@@ -6,13 +6,12 @@ import dbHelper from "../helpers/db.helper";
 const AUTH_HEADER = "authorization";
 const BEARER_AUTH_SCHEME = "bearer";
 
-const onAuthorize = (req: Request, res: Response, next: NextFunction) => {
+const onAuthorized = (req: Request, res: Response, next: NextFunction) => {
   console.log(req.session.user);
 };
 
 const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
   const query = url.parse(req.url, true).query;
-  console.log(query);
   return res.render("login", {
     title: "SSO Server | Sign in",
     responseType: query["responseType"],
@@ -21,11 +20,11 @@ const renderLoginView = (req: Request, res: Response, next: NextFunction) => {
   });
 };
 
-const signin = async (req: Request, res: Response) => {
+const onLogin = async (req: Request, res: Response) => {
   if (req.body) {
-    const { email, password, clientId, redirectUrl } = req.body;
+    const { email, password, clientID, serviceURL } = req.body;
 
-    if (redirectUrl === null) {
+    if (serviceURL === null) {
       return res.redirect("/");
     }
 
@@ -40,21 +39,22 @@ const signin = async (req: Request, res: Response) => {
 
           // create authorization token
           const code = authHelper.generateAuthorizationCode(
-            clientId,
-            redirectUrl
+            clientID,
+            serviceURL
           );
-          authHelper.storeClientInCache(redirectUrl, result.userID, code);
+          authHelper.storeClientInCache(serviceURL, result.userID, code);
 
           // redirect to client with an authorization token
-          return res.redirect(302, redirectUrl + `?authorization_code=${code}`);
+          return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
+        } else {
+          return res
+            .status(404)
+            .send({ success: false, message: "User not found" });
         }
-        return res
-          .status(404)
-          .send({ success: false, message: "User not found" });
       }
     );
   } else {
-    return res.status(404).send({ success: false, message: "User not found" });
+    return res.redirect("/");
   }
 };
 
@@ -92,4 +92,4 @@ const onGetToken = async (req: Request, res: Response) => {
   }
 };
 
-export default { onAuthorize, renderLoginView, signin, onGetToken };
+export default { onAuthorized, renderLoginView, onLogin, onGetToken };
