@@ -1,3 +1,5 @@
+import UserModel from "../models/user.model";
+
 type OriginNameType = {
   [key: string]: string;
 };
@@ -7,7 +9,7 @@ type AllowOriginType = {
 };
 
 type SessionUserType = {
-  [key: string]: UserType;
+  [key: string]: UserModel;
 };
 
 type SessionClientType = {

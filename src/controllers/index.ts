@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 import * as url from "url";
 import authHelper from "../helpers/auth.helper";
-import dbHelper from "../helpers/db.helper";
+import { findUser } from "../data/user.db";
+import UserModel from "../models/user.model";
 
 const onAuthorized = (req: Request, res: Response, next: NextFunction) => {
   const serviceURL = req.query["serviceURL"] as string;
@@ -38,31 +39,24 @@ const onLogin = async (req: Request, res: Response) => {
       return res.redirect("/");
     }
 
-    dbHelper.checkCredential(
-      email,
-      password,
-      (result: UserType | undefined) => {
-        if (result !== undefined) {
-          // create global session here
-          req.session.user = result;
-          authHelper.sessionUser[result.userID] = result;
+    findUser(email, password, (result: UserModel | undefined) => {
+      if (result !== undefined) {
+        // create global session here
+        req.session.user = { ...result, password: undefined };
+        authHelper.sessionUser[`${result.userID}`] = result;
 
-          // create authorization token
-          const code = authHelper.generateAuthorizationCode(
-            clientID,
-            serviceURL
-          );
-          authHelper.storeClientInCache(serviceURL, result.userID, code);
+        // create authorization token
+        const code = authHelper.generateAuthorizationCode(clientID, serviceURL);
+        authHelper.storeClientInCache(serviceURL, `${result.userID}`, code);
 
-          // redirect to client with an authorization token
-          return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
-        } else {
-          return res
-            .status(404)
-            .send({ success: false, message: "User not found" });
-        }
+        // redirect to client with an authorization token
+        return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
+      } else {
+        return res
+          .status(404)
+          .send({ success: false, message: "User not found" });
       }
-    );
+    });
   } else {
     return res.redirect("/");
   }

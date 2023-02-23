@@ -37,7 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const url = __importStar(require("url"));
 const auth_helper_1 = __importDefault(require("../helpers/auth.helper"));
-const db_helper_1 = __importDefault(require("../helpers/db.helper"));
+const user_db_1 = require("../data/user.db");
 const onAuthorized = (req, res, next) => {
     const serviceURL = req.query["serviceURL"];
     if (serviceURL === null || serviceURL === undefined) {
@@ -65,14 +65,14 @@ const onLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         if (serviceURL === null) {
             return res.redirect("/");
         }
-        db_helper_1.default.checkCredential(email, password, (result) => {
+        (0, user_db_1.findUser)(email, password, (result) => {
             if (result !== undefined) {
                 // create global session here
-                req.session.user = result;
-                auth_helper_1.default.sessionUser[result.userID] = result;
+                req.session.user = Object.assign(Object.assign({}, result), { password: undefined });
+                auth_helper_1.default.sessionUser[`${result.userID}`] = result;
                 // create authorization token
                 const code = auth_helper_1.default.generateAuthorizationCode(clientID, serviceURL);
-                auth_helper_1.default.storeClientInCache(serviceURL, result.userID, code);
+                auth_helper_1.default.storeClientInCache(serviceURL, `${result.userID}`, code);
                 // redirect to client with an authorization token
                 return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
             }

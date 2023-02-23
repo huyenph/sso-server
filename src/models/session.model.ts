@@ -6,7 +6,6 @@ import {
   CreateOptions,
 } from "sequelize";
 import connection from "../configs/connection";
-import UserModel from "./user.model";
 
 class SessionModel extends Model<
   InferAttributes<SessionModel>,
@@ -42,7 +41,5 @@ SessionModel.init(
     sequelize: connection,
   }
 );
-
-// UserModel.belongsTo(UserModel, { foreignKey: "user_pk" });
 
 export default SessionModel;
