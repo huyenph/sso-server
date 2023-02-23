@@ -6,12 +6,14 @@ import {
   CreateOptions,
 } from "sequelize";
 import connection from "../configs/connection";
+import UserModel from "./user.model";
 
 class SessionModel extends Model<
   InferAttributes<SessionModel>,
   InferCreationAttributes<SessionModel>
 > {
   declare sessionID: CreateOptions<number>;
+  declare userID: number;
   declare token: string;
   declare readonly createdAt?: Date;
   declare readonly expiredAt?: Date;
@@ -24,6 +26,13 @@ SessionModel.init(
       autoIncrement: true,
       primaryKey: true,
     },
+    userID: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "users",
+        key: "userID",
+      },
+    },
     token: DataTypes.STRING,
     expiredAt: DataTypes.DATE,
   },
@@ -34,8 +43,6 @@ SessionModel.init(
   }
 );
 
-// UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
-//   foreignKey: "user_pk",
-// });
+// UserModel.belongsTo(UserModel, { foreignKey: "user_pk" });
 
 export default SessionModel;

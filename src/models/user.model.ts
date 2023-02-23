@@ -6,6 +6,7 @@ import {
   CreateOptions,
 } from "sequelize";
 import connection from "../configs/connection";
+import SessionModel from "./session.model";
 
 class UserModel extends Model<
   InferAttributes<UserModel>,
@@ -55,8 +56,6 @@ UserModel.init(
   }
 );
 
-// UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
-//   foreignKey: "user_pk",
-// });
+// UserModel.hasMany(SessionModel, { foreignKey: "user_pk" });
 
 export default UserModel;

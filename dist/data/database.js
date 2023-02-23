@@ -21,6 +21,14 @@ const initAllModels = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield user_model_1.default.sync({ alter: process.env.NODE_ENV === "development" });
         yield session_model_1.default.sync({ alter: process.env.NODE_ENV === "development" });
+        // await SessionModel.belongsTo(UserModel, {
+        //   foreignKeyConstraint: true,
+        //   foreignKey: "userID",
+        // });
+        // UserModel.hasMany(SessionModel, {
+        //   foreignKeyConstraint: true,
+        //   foreignKey: "userID",
+        // });
     }
     catch (error) {
         throw error;

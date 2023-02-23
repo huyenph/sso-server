@@ -13,6 +13,13 @@ SessionModel.init({
         autoIncrement: true,
         primaryKey: true,
     },
+    userID: {
+        type: sequelize_1.DataTypes.INTEGER,
+        references: {
+            model: "users",
+            key: "userID",
+        },
+    },
     token: sequelize_1.DataTypes.STRING,
     expiredAt: sequelize_1.DataTypes.DATE,
 }, {
@@ -20,7 +27,5 @@ SessionModel.init({
     tableName: "sessions",
     sequelize: connection_1.default,
 });
-// UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
-//   foreignKey: "user_pk",
-// });
+// UserModel.belongsTo(UserModel, { foreignKey: "user_pk" });
 exports.default = SessionModel;

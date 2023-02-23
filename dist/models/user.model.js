@@ -37,7 +37,5 @@ UserModel.init({
     tableName: "users",
     sequelize: connection_1.default,
 });
-// UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
-//   foreignKey: "user_pk",
-// });
+// UserModel.hasMany(SessionModel, { foreignKey: "user_pk" });
 exports.default = UserModel;
