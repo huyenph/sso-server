@@ -13,10 +13,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initAllModels = void 0;
+const dotenv_1 = __importDefault(require("dotenv"));
 const user_model_1 = __importDefault(require("../models/user.model"));
+const session_model_1 = __importDefault(require("../models/session.model"));
+dotenv_1.default.config();
 const initAllModels = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield user_model_1.default.sync();
+        yield user_model_1.default.sync({ alter: process.env.NODE_ENV === "development" });
+        yield session_model_1.default.sync({ alter: process.env.NODE_ENV === "development" });
     }
     catch (error) {
         throw error;

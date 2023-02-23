@@ -1,8 +1,6 @@
 import {
-  Sequelize,
   DataTypes,
   Model,
-  Optional,
   InferAttributes,
   InferCreationAttributes,
   CreateOptions,
@@ -62,41 +60,3 @@ UserModel.init(
 // });
 
 export default UserModel;
-
-// const userModel = dbHelper.sequelize.define(
-//   "Users",
-//   {
-//     userID: {
-//       type: DataTypes.INTEGER,
-//       autoIncrement: true,
-//       primaryKey: true,
-//     },
-//     username: DataTypes.STRING,
-//     password: DataTypes.STRING,
-//     email: DataTypes.STRING,
-//     isActive: {
-//       type: DataTypes.BOOLEAN,
-//       defaultValue: true,
-//     },
-//     role: {
-//       type: DataTypes.ENUM,
-//       values: [
-//         "admin",
-//         "manager",
-//         "developer",
-//         "finance",
-//         "sales",
-//         "marketing",
-//         "user",
-//       ],
-//       defaultValue: "user",
-//     },
-//   },
-//   {
-//     tableName: "users",
-//   }
-// );
-
-// userModel.hasMany(SessionModel.sessionModel, { foreignKey: "user_pk" });
-
-// export default { userModel };
