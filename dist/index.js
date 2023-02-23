@@ -45,12 +45,6 @@ app.use("/sso", routers_1.default);
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
     db_helper_1.default.syncAllModels();
-    // dbHelper.insertUser(
-    //   "Huyen Pham dev",
-    //   "123456",
-    //   "huyenp1@gmail.com",
-    //   true,
-    //   "developer"
-    // );
+    db_helper_1.default.insertUser("Huyen Pham", "123456", "huyenp1@gmail.com", true, "admin");
 });
 exports.default = app;

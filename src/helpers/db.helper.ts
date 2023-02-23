@@ -1,29 +1,11 @@
 import bcrypt from "bcrypt";
 import mysql from "mysql2";
-import config from "../configs";
-import { userModel } from "../models/user.model";
-
-const { Sequelize } = require("sequelize");
-
-const dbConfig = config.dbConfig;
-
-const sequelize = new Sequelize(
-  dbConfig.DB,
-  dbConfig.USER,
-  dbConfig.PASSWORD,
-  dbConfig.options
-);
-
-// const connection = mysql.createPool(config.mysqlConfig);
-
-const mysqlDB: DatabaseType = {
-  sequelize: sequelize,
-  users: userModel(sequelize),
-};
+import connection from "../configs/connection";
+import UserModel from "../models/user.model";
 
 const authenticate = async () => {
   try {
-    await sequelize.authenticate();
+    await connection.authenticate();
   } catch (error) {
     throw error;
   }
@@ -32,7 +14,7 @@ const authenticate = async () => {
 // Synchronizing all models at once
 const syncAllModels = async () => {
   try {
-    await mysqlDB.sequelize.sync();
+    await UserModel.sync();
   } catch (error) {
     throw error;
   }
@@ -43,7 +25,7 @@ const insertUser = async (
   password: string,
   email: string,
   isActive: boolean,
-  role: string
+  role: UserRole
 ) => {
   bcrypt.genSalt(10, (err: any, salt: any) => {
     bcrypt.hash(password, salt, async (err: any, hash: string) => {
@@ -52,7 +34,7 @@ const insertUser = async (
       //   [userID, username, hash, email, role],
       //   (err: any, results: any, fields: any) => {}
       // );
-      await mysqlDB.users.create({
+      await connection.models.UserModel.create({
         username: username,
         password: hash,
         email: email,
@@ -68,19 +50,21 @@ const checkCredential = async (
   password: string,
   callback: (result: UserType | undefined) => void
 ): Promise<any> => {
-  const user = await mysqlDB.users.findOne({ where: { email: email } });
-  if (user !== null) {
-    bcrypt.compare(
-      password,
-      user.password,
-      (_: Error | undefined, isMatch: boolean) => {
-        if (isMatch) {
-          return callback(user);
-        }
-        return callback(undefined);
-      }
-    );
-  }
+  // const user = await sequelize.models.UserModel.users.findOne({
+  //   where: { email: email },
+  // });
+  // if (user !== null) {
+  //   bcrypt.compare(
+  //     password,
+  //     user.password,
+  //     (_: Error | undefined, isMatch: boolean) => {
+  //       if (isMatch) {
+  //         return callback(user);
+  //       }
+  //       return callback(undefined);
+  //     }
+  //   );
+  // }
   // connection.query(
   //   `SELECT * FROM Users WHERE username = "${username}"`,
   //   (err: any, results: any, fields: any) => {
@@ -106,7 +90,8 @@ const checkCredential = async (
 };
 
 export default {
-  mysqlDB,
+  // sequelize,
+  // mysqlDB,
   authenticate,
   syncAllModels,
   insertUser,

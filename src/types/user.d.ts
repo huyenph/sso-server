@@ -1,12 +1,11 @@
-enum UserRole {
-  "admin",
-  "manager",
-  "developer",
-  "finance",
-  "sales",
-  "marketing",
-  "user",
-}
+type UserRole =
+  | "admin"
+  | "manager"
+  | "developer"
+  | "finance"
+  | "sales"
+  | "marketing"
+  | "user";
 
 type UserType = {
   userID: string;

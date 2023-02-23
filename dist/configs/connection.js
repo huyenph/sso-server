@@ -6,22 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
-const dbConfig = {
-    DB: process.env.MYSQL_DB,
-    USER: process.env.MYSQL_USER,
-    PASSWORD: process.env.MYSQL_PASS,
-    options: {
-        host: process.env.MYSQL_HOST,
-        dialect: process.env.DIALECT,
-        pool: {
-            max: 20,
-            min: 15,
-            acquire: process.env.POOL_ACQUIRE,
-            idle: process.env.POOL_IDLE,
-        },
+const connection = new sequelize_1.Sequelize(process.env.MYSQL_DB, process.env.MYSQL_USER, process.env.MYSQL_PASS, {
+    host: process.env.MYSQL_HOST,
+    dialect: process.env.DIALECT,
+    pool: {
+        max: 20,
+        min: 15,
+        acquire: process.env.POOL_ACQUIRE,
+        idle: process.env.POOL_IDLE,
     },
-};
-const sequelize = new sequelize_1.Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, dbConfig.options);
+});
 const mysqlConfig = {
     host: process.env.HOST,
     database: process.env.DB,
@@ -33,4 +27,4 @@ const mysqlConfig = {
     idleTimeout: 60000,
     queueLimit: 0,
 };
-exports.default = sequelize;
+exports.default = connection;
