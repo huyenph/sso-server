@@ -13,19 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const configs_1 = __importDefault(require("../configs"));
-const user_model_1 = require("../models/user.model");
-const { Sequelize } = require("sequelize");
-const dbConfig = configs_1.default.dbConfig;
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, dbConfig.options);
-// const connection = mysql.createPool(config.mysqlConfig);
-const mysqlDB = {
-    sequelize: sequelize,
-    users: (0, user_model_1.userModel)(sequelize),
-};
+const connection_1 = __importDefault(require("../configs/connection"));
+const user_model_1 = __importDefault(require("../models/user.model"));
 const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield sequelize.authenticate();
+        yield connection_1.default.authenticate();
     }
     catch (error) {
         throw error;
@@ -34,7 +26,7 @@ const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
 // Synchronizing all models at once
 const syncAllModels = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mysqlDB.sequelize.sync();
+        yield user_model_1.default.sync();
     }
     catch (error) {
         throw error;
@@ -48,7 +40,7 @@ const insertUser = (username, password, email, isActive, role) => __awaiter(void
             //   [userID, username, hash, email, role],
             //   (err: any, results: any, fields: any) => {}
             // );
-            yield mysqlDB.users.create({
+            yield connection_1.default.models.UserModel.create({
                 username: username,
                 password: hash,
                 email: email,
@@ -59,15 +51,21 @@ const insertUser = (username, password, email, isActive, role) => __awaiter(void
     });
 });
 const checkCredential = (email, password, callback) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield mysqlDB.users.findOne({ where: { email: email } });
-    if (user !== null) {
-        bcrypt_1.default.compare(password, user.password, (_, isMatch) => {
-            if (isMatch) {
-                return callback(user);
-            }
-            return callback(undefined);
-        });
-    }
+    // const user = await sequelize.models.UserModel.users.findOne({
+    //   where: { email: email },
+    // });
+    // if (user !== null) {
+    //   bcrypt.compare(
+    //     password,
+    //     user.password,
+    //     (_: Error | undefined, isMatch: boolean) => {
+    //       if (isMatch) {
+    //         return callback(user);
+    //       }
+    //       return callback(undefined);
+    //     }
+    //   );
+    // }
     // connection.query(
     //   `SELECT * FROM Users WHERE username = "${username}"`,
     //   (err: any, results: any, fields: any) => {
@@ -92,7 +90,8 @@ const checkCredential = (email, password, callback) => __awaiter(void 0, void 0,
     // );
 });
 exports.default = {
-    mysqlDB,
+    // sequelize,
+    // mysqlDB,
     authenticate,
     syncAllModels,
     insertUser,

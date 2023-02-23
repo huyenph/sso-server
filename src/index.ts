@@ -49,13 +49,13 @@ app.use("/sso", router);
 app.listen(port, () => {
   console.log(`App listening on port: ${port}`);
   dbHelper.syncAllModels();
-  // dbHelper.insertUser(
-  //   "Huyen Pham dev",
-  //   "123456",
-  //   "huyenp1@gmail.com",
-  //   true,
-  //   "developer"
-  // );
+  dbHelper.insertUser(
+    "Huyen Pham",
+    "123456",
+    "huyenp1@gmail.com",
+    true,
+    "admin"
+  );
 });
 
 export default app;
