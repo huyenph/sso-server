@@ -12,13 +12,7 @@ const authenticate = async () => {
 };
 
 // Synchronizing all models at once
-const syncAllModels = async () => {
-  try {
-    await UserModel.sync();
-  } catch (error) {
-    throw error;
-  }
-};
+const syncAllModels = async () => {};
 
 const insertUser = async (
   username: string,
@@ -34,13 +28,13 @@ const insertUser = async (
       //   [userID, username, hash, email, role],
       //   (err: any, results: any, fields: any) => {}
       // );
-      await connection.models.UserModel.create({
-        username: username,
-        password: hash,
-        email: email,
-        isActive: isActive,
-        role: role,
-      });
+      // await UserModel.create({
+      //   username: username,
+      //   password: hash,
+      //   email: email,
+      //   isActive: isActive,
+      //   role: role,
+      // });
     });
   });
 };

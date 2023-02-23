@@ -16,3 +16,19 @@ type UserType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+type UserAttributes = {
+  userID: number;
+  username: string;
+  password: string;
+  email: string;
+  isActive: boolean;
+  role: UserRole;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+// userID is optional
+type UserCreationAttributes = Optional<UserAttributes, "userID">;
+
+// interface UserModelOutput extends Required<UserModelAttributes> {}

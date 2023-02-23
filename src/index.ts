@@ -5,6 +5,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import dbHelper from "./helpers/db.helper";
 import router from "./routers";
+import { insertUser } from "./data/user.db";
+import { initAllModels } from "./data/database";
+import UserModel from "./models/user.model";
 
 dotenv.config();
 
@@ -48,14 +51,14 @@ app.use("/sso", router);
 
 app.listen(port, () => {
   console.log(`App listening on port: ${port}`);
-  dbHelper.syncAllModels();
-  dbHelper.insertUser(
-    "Huyen Pham",
-    "123456",
-    "huyenp1@gmail.com",
-    true,
-    "admin"
-  );
+  initAllModels();
+  insertUser(<UserModel>{
+    username: "Huyen Pham",
+    password: "123456",
+    email: "huyenp@gmail.com",
+    isActive: false,
+    role: "developer",
+  });
 });
 
 export default app;
