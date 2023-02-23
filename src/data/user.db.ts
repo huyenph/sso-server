@@ -4,14 +4,31 @@ import UserModel from "../models/user.model";
 const insertUser = async (payload: UserModel) => {
   bcrypt.genSalt(10, (err: any, salt: any) => {
     bcrypt.hash(payload.password, salt, async (err: any, hash: string) => {
-      // connection.query(
-      //   "INSERT INTO Users (userID, username, password, email, role) VALUES (?,?,?,?,?)",
-      //   [userID, username, hash, email, role],
-      //   (err: any, results: any, fields: any) => {}
-      // );
       await UserModel.create(<UserModel>{ ...payload, password: hash });
     });
   });
 };
 
-export { insertUser };
+const findUser = async (
+  email: string,
+  password: string,
+  callback: (result: UserModel | undefined) => void
+) => {
+  const user = await UserModel.findOne({
+    where: { email: email },
+  });
+  if (user !== null) {
+    bcrypt.compare(
+      password,
+      user.password,
+      (_: Error | undefined, isMatch: boolean) => {
+        if (isMatch) {
+          return callback(user);
+        }
+        return callback(undefined);
+      }
+    );
+  }
+};
+
+export { insertUser, findUser };

@@ -3,11 +3,9 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-import dbHelper from "./helpers/db.helper";
 import router from "./routers";
 import { insertUser } from "./data/user.db";
 import { initAllModels } from "./data/database";
-import UserModel from "./models/user.model";
 
 dotenv.config();
 

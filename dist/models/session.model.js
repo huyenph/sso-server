@@ -27,5 +27,4 @@ SessionModel.init({
     tableName: "sessions",
     sequelize: connection_1.default,
 });
-// UserModel.belongsTo(UserModel, { foreignKey: "user_pk" });
 exports.default = SessionModel;

@@ -2,6 +2,15 @@ import CryptoJS from "crypto-js";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import { privateCert } from "../configs/keys";
+import UserModel from "../models/user.model";
+import {
+  AllowOriginType,
+  AppTokenDBType,
+  IntermediateTokenCacheType,
+  OriginNameType,
+  SessionClientType,
+  SessionUserType,
+} from "../types/helper";
 
 dotenv.config();
 
@@ -91,7 +100,7 @@ const generateAccessToken = (
 ) => {
   const ssoCode: string = authCode.replace(/\s/g, "+");
   const globalSessionToken: string = intermediateTokenCache[ssoCode][0];
-  const userInfo: UserType = sessionUser[globalSessionToken];
+  const userInfo: UserModel = sessionUser[globalSessionToken];
   return jwt.sign(
     {
       clientID: clientId,
