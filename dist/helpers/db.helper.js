@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const connection_1 = __importDefault(require("../configs/connection"));
-const user_model_1 = __importDefault(require("../models/user.model"));
 const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield connection_1.default.authenticate();
@@ -24,14 +23,7 @@ const authenticate = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 // Synchronizing all models at once
-const syncAllModels = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        yield user_model_1.default.sync();
-    }
-    catch (error) {
-        throw error;
-    }
-});
+const syncAllModels = () => __awaiter(void 0, void 0, void 0, function* () { });
 const insertUser = (username, password, email, isActive, role) => __awaiter(void 0, void 0, void 0, function* () {
     bcrypt_1.default.genSalt(10, (err, salt) => {
         bcrypt_1.default.hash(password, salt, (err, hash) => __awaiter(void 0, void 0, void 0, function* () {
@@ -40,13 +32,13 @@ const insertUser = (username, password, email, isActive, role) => __awaiter(void
             //   [userID, username, hash, email, role],
             //   (err: any, results: any, fields: any) => {}
             // );
-            yield connection_1.default.models.UserModel.create({
-                username: username,
-                password: hash,
-                email: email,
-                isActive: isActive,
-                role: role,
-            });
+            // await UserModel.create({
+            //   username: username,
+            //   password: hash,
+            //   email: email,
+            //   isActive: isActive,
+            //   role: role,
+            // });
         }));
     });
 });

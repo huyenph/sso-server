@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const connection_1 = __importDefault(require("../configs/connection"));
+// import SessionModel from "./session.model";
 class UserModel extends sequelize_1.Model {
 }
 UserModel.init({
@@ -40,7 +41,6 @@ UserModel.init({
 // UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
 //   foreignKey: "user_pk",
 // });
-// UserModel.sync();
 exports.default = UserModel;
 // const userModel = dbHelper.sequelize.define(
 //   "Users",

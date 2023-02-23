@@ -1,35 +1,26 @@
-import { Sequelize, DataTypes, Model, Optional } from "sequelize";
-import dbHelper from "../helpers/db.helper";
+import {
+  Sequelize,
+  DataTypes,
+  Model,
+  Optional,
+  InferAttributes,
+  InferCreationAttributes,
+  CreateOptions,
+} from "sequelize";
 import connection from "../configs/connection";
-// import SessionModel from "./session.model";
 
-interface UserModelAttributes {
-  userID: number;
-  username: string;
-  password: string;
-  email: string;
-  isActive: boolean;
-  role: UserRole;
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-interface UserModelInput extends Optional<UserModelAttributes, "userID"> {}
-
-interface UserModelOutput extends Required<UserModelAttributes> {}
-
-class UserModel
-  extends Model<UserModelAttributes, UserModelInput>
-  implements UserModelAttributes
-{
-  public userID!: number;
-  public username!: string;
-  public password!: string;
-  public email!: string;
-  public isActive!: boolean;
-  public role!: UserRole;
-  public readonly createdAt!: Date;
-  public readonly updatedAt!: Date;
+class UserModel extends Model<
+  InferAttributes<UserModel>,
+  InferCreationAttributes<UserModel>
+> {
+  declare userID: CreateOptions<number>;
+  declare username: string;
+  declare password: string;
+  declare email: string;
+  declare isActive: boolean;
+  declare role: UserRole;
+  declare readonly createdAt?: Date;
+  declare readonly updatedAt?: Date;
 }
 
 UserModel.init(
@@ -69,8 +60,6 @@ UserModel.init(
 // UserModel.hasMany(dbHelper.sequelize.models.SessionModel, {
 //   foreignKey: "user_pk",
 // });
-
-// UserModel.sync();
 
 export default UserModel;
 
