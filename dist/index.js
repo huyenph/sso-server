@@ -9,7 +9,6 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 const routers_1 = __importDefault(require("./routers"));
-const user_db_1 = require("./data/user.db");
 const database_1 = require("./data/database");
 dotenv_1.default.config();
 const port = process.env.PORT || 3001;
@@ -46,19 +45,12 @@ app.use("/sso", routers_1.default);
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
     (0, database_1.initAllModels)();
-    (0, user_db_1.insertUser)({
-        username: "Huyen Pham",
-        password: "123456",
-        email: "huyenp@gmail.com",
-        isActive: false,
-        role: "developer",
-    });
-    // dbHelper.insertUser(
-    //   "Huyen Pham DEV",
-    //   "123456",
-    //   "huyenp1@gmail.com",
-    //   true,
-    //   "developer"
-    // );
+    // insertUser(<UserModel>{
+    //   username: "Huyen Pham",
+    //   password: "123456",
+    //   email: "huyenp@gmail.com",
+    //   isActive: false,
+    //   role: "developer",
+    // });
 });
 exports.default = app;

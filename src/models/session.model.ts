@@ -1,50 +1,48 @@
-import { Sequelize, DataTypes, Model } from "sequelize";
-import dbHelper from "../helpers/db.helper";
+import {
+  DataTypes,
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
+  CreateOptions,
+} from "sequelize";
+import connection from "../configs/connection";
 import UserModel from "./user.model";
 
-// class SessionModel extends Model {}
+class SessionModel extends Model<
+  InferAttributes<SessionModel>,
+  InferCreationAttributes<SessionModel>
+> {
+  declare sessionID: CreateOptions<number>;
+  declare userID: number;
+  declare token: string;
+  declare readonly createdAt?: Date;
+  declare readonly expiredAt?: Date;
+}
 
-// SessionModel.init(
-//   {
-//     sessionID: {
-//       type: DataTypes.INTEGER,
-//       autoIncrement: true,
-//       primaryKey: true,
-//     },
-//     token: DataTypes.STRING,
-//     expiredAt: DataTypes.DATE,
-//   },
-//   {
-//     tableName: "sessions",
-//     sequelize: dbHelper.sequelize,
-//   }
-// );
+SessionModel.init(
+  {
+    sessionID: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    userID: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: "users",
+        key: "userID",
+      },
+    },
+    token: DataTypes.STRING,
+    expiredAt: DataTypes.DATE,
+  },
+  {
+    updatedAt: false,
+    tableName: "sessions",
+    sequelize: connection,
+  }
+);
 
-// SessionModel.belongsTo(dbHelper.sequelize.models.UserModel, {
-//   foreignKey: "user_pk",
-// });
+// UserModel.belongsTo(UserModel, { foreignKey: "user_pk" });
 
-// export default new SessionModel();
-
-// const sessionModel = dbHelper.sequelize.define(
-//   "Sessions",
-//   {
-//     sessionID: {
-//       type: DataTypes.INTEGER,
-//       autoIncrement: true,
-//       primaryKey: true,
-//     },
-//     token: DataTypes.STRING,
-//     expiredAt: DataTypes.DATE,
-//   },
-//   {
-//     updatedAt: false,
-//     tableName: "session",
-//   }
-// );
-
-// sessionModel.belongsTo(UserModel.userModel, {
-//   foreignKey: "user_pk",
-// });
-
-// export default { sessionModel };
+export default SessionModel;
