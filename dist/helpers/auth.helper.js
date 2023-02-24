@@ -24,11 +24,16 @@ const appTokenDB = {
     client_2: "1g0jJwGmRQhJwvwNOrY4i90kD0m",
 };
 const secretKey = process.env.SECRET_KEY || "up9E5FC6TIwBDHadHAcLA7M3XeilqRfa";
-const generateAuthorizationCode = (clientId, redirectUrl) => {
+const generateAuthorizationCode = (userId, clientId, serviceUrl) => {
+    const current = new Date();
+    console.log(current);
+    const expiredTime = current.setMinutes(current.getMinutes() + 15);
+    console.log(new Date(expiredTime));
     return crypto_js_1.default.AES.encrypt(JSON.stringify({
+        userID: userId,
         clientID: clientId,
-        serviceURL: redirectUrl,
-        exp: Date.now() + 600,
+        serviceURL: serviceUrl,
+        exp: expiredTime,
     }), secretKey).toString();
 };
 const authenticateClient = (clientId, clientSecret) => {
@@ -53,11 +58,16 @@ const verifyAuthorizationCode = (bearerCode, authCode, clientId, serviceUrl) => 
     }
     const authData = JSON.parse(crypto_js_1.default.AES.decrypt(ssoCode, secretKey).toString(crypto_js_1.default.enc.Utf8));
     if (authData) {
+        console.log(authData);
         const { clientID, serviceURL, exp } = authData;
         if (clientId !== clientID || serviceURL !== serviceUrl) {
+            console.log(`clientId: ${clientId}`);
+            console.log(`url: ${serviceUrl}`);
+            console.log("eror here");
             return false;
         }
         if (exp < Date.now()) {
+            console.log("or here");
             return false;
         }
         return true;

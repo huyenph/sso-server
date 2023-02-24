@@ -16,6 +16,7 @@ const app: Express = express();
 
 let sessionCookie: SessionCookieType = {
   secure: false,
+  maxAge: 1000 * 60 * 60 * 24 * 365,
 };
 
 let sess: SessionType = {
@@ -63,8 +64,8 @@ app.listen(port, () => {
   //   username: "Huyen Pham",
   //   password: "123456",
   //   email: "huyenp@gmail.com",
-  //   isActive: false,
-  //   role: "developer",
+  //   isActive: true,
+  //   role: "admin",
   // });
 });
 

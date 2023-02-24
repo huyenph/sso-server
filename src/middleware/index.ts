@@ -3,6 +3,7 @@ import authHelper from "../helpers/auth.helper";
 
 const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
   const serviceURL = req.query["serviceURL"];
+  console.log(req.session);
   if (req.session.user === undefined || req.session.user === null) {
     return res.redirect(
       `/sso/login?responseType=${req.query["responseType"]}&clientID=${req.query["clientID"]}&serviceURL=${serviceURL}`
@@ -28,6 +29,7 @@ const login = (req: Request, res: Response, next: NextFunction) => {
       if (req.session.user !== undefined) {
         const code = authHelper.generateAuthorizationCode(
           req.session.user.id,
+          req.query["clientID"] as string,
           serviceURL
         );
         authHelper.storeClientInCache(serviceURL, req.session.user.id, code);
