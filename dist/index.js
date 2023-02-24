@@ -45,6 +45,14 @@ app.use("/sso", routers_1.default);
 app.listen(port, () => {
     console.log(`App listening on port: ${port}`);
     (0, database_1.initAllModels)();
+    // const user: UserModel = <UserModel>{
+    //   username: "Huyen Pham",
+    //   password: "123456",
+    //   email: "huyenp@gmail.com",
+    //   isActive: false,
+    //   role: "developer",
+    //   createdAt: new Date(),
+    // };
     // insertUser(<UserModel>{
     //   username: "Huyen Pham",
     //   password: "123456",
