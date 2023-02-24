@@ -21,6 +21,7 @@ SessionModel.init({
         },
     },
     token: sequelize_1.DataTypes.STRING,
+    createdAt: sequelize_1.DataTypes.DATE,
     expiredAt: sequelize_1.DataTypes.DATE,
 }, {
     updatedAt: false,

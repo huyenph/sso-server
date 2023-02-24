@@ -3,7 +3,7 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
-  CreateOptions,
+  CreationOptional,
 } from "sequelize";
 import connection from "../configs/connection";
 
@@ -11,11 +11,11 @@ class SessionModel extends Model<
   InferAttributes<SessionModel>,
   InferCreationAttributes<SessionModel>
 > {
-  declare sessionID: CreateOptions<number>;
+  declare sessionID: CreationOptional<number>;
   declare userID: number;
   declare token: string;
-  declare readonly createdAt: Date | null;
-  declare readonly expiredAt: Date | null;
+  declare readonly createdAt: CreationOptional<Date>;
+  declare readonly expiredAt: CreationOptional<Date>;
 }
 
 SessionModel.init(
