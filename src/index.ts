@@ -1,5 +1,5 @@
 import express, { Express, NextFunction, Request, Response } from "express";
-import session from "express-session";
+import session, { Cookie } from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -7,6 +7,7 @@ import router from "./routers";
 import { insertUser } from "./data/user.db";
 import { initAllModels } from "./data/database";
 import UserModel from "./models/user.model";
+import { SessionType } from "./types/session";
 
 dotenv.config();
 
@@ -14,9 +15,10 @@ const port = process.env.PORT || 3001;
 
 const app: Express = express();
 
-let sessionCookie: SessionCookieType = {
+let sessionCookie: Cookie = {
   secure: false,
-  maxAge: 1000 * 60 * 60 * 24 * 365,
+  maxAge: process.env.MAX_AGE as any,
+  originalMaxAge: process.env.MAX_AGE as any,
 };
 
 let sess: SessionType = {

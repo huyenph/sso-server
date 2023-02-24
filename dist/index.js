@@ -15,7 +15,8 @@ const port = process.env.PORT || 3001;
 const app = (0, express_1.default)();
 let sessionCookie = {
     secure: false,
-    maxAge: 1000 * 60 * 60 * 24 * 365,
+    maxAge: 0,
+    originalMaxAge: 60 * 1000,
 };
 let sess = {
     resave: true,

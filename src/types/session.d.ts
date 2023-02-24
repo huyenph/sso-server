@@ -1,8 +1,10 @@
+import { Cookie } from "express-session";
+
 type SessionType = {
   resave: boolean;
   saveUninitialized: boolean;
   secret: string;
-  cookie: SessionCookieType | undefined;
+  cookie: Cookie | undefined;
 };
 
 type SessionCookieType = {
