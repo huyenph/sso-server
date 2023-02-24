@@ -14,8 +14,8 @@ class SessionModel extends Model<
   declare sessionID: CreateOptions<number>;
   declare userID: number;
   declare token: string;
-  declare readonly createdAt?: Date;
-  declare readonly expiredAt?: Date;
+  declare readonly createdAt: Date | null;
+  declare readonly expiredAt: Date | null;
 }
 
 SessionModel.init(
@@ -33,6 +33,7 @@ SessionModel.init(
       },
     },
     token: DataTypes.STRING,
+    createdAt: DataTypes.DATE,
     expiredAt: DataTypes.DATE,
   },
   {

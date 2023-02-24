@@ -33,6 +33,8 @@ UserModel.init({
         ],
         defaultValue: "user",
     },
+    createdAt: sequelize_1.DataTypes.DATE,
+    updatedAt: sequelize_1.DataTypes.DATE,
 }, {
     tableName: "users",
     sequelize: connection_1.default,
