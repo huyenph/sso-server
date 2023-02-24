@@ -3,7 +3,7 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
-  CreateOptions,
+  CreationOptional,
 } from "sequelize";
 import connection from "../configs/connection";
 
@@ -11,14 +11,14 @@ class UserModel extends Model<
   InferAttributes<UserModel>,
   InferCreationAttributes<UserModel>
 > {
-  declare userID: number;
+  declare userID: CreationOptional<number>;
   declare username: string;
   declare password: string;
   declare email: string;
   declare isActive: boolean;
   declare role: UserRole;
-  declare readonly createdAt: Date | null;
-  declare readonly updatedAt: Date | null;
+  declare readonly createdAt: CreationOptional<Date>;
+  declare readonly updatedAt: CreationOptional<Date>;
 }
 
 UserModel.init(
