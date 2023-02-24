@@ -13,20 +13,23 @@ const database_1 = require("./data/database");
 dotenv_1.default.config();
 const port = process.env.PORT || 3001;
 const app = (0, express_1.default)();
-let sessionCookie = {
-    secure: false,
-    maxAge: 0,
-    originalMaxAge: 60 * 1000,
-};
 let sess = {
     resave: true,
     saveUninitialized: true,
     secret: "secretKey",
-    cookie: sessionCookie,
+    cookie: {
+        secure: false,
+        maxAge: process.env.MAX_AGE,
+        originalMaxAge: process.env.MAX_AGE,
+    },
 };
 if (process.env.NODE_ENV === "production") {
     app.set("trust proxy", 1);
-    sessionCookie.secure = true;
+    sess = Object.assign(Object.assign({}, sess), { cookie: {
+            secure: false,
+            maxAge: process.env.MAX_AGE,
+            originalMaxAge: process.env.MAX_AGE,
+        } });
 }
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use(express_1.default.json());
