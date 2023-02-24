@@ -89,7 +89,6 @@ const onLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 const onGetToken = (req, res) => {
-    console.log(req.body);
     if (req.body) {
         const { authorizationCode, clientID, clientSecret, serviceURL } = req.body;
         if (!auth_helper_1.default.authenticateClient(clientID, clientSecret)) {
