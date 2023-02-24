@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const auth_helper_1 = __importDefault(require("../helpers/auth.helper"));
 const isAuthenticated = (req, res, next) => {
     const serviceURL = req.query["serviceURL"];
+    console.log(req.session);
     if (req.session.user === undefined || req.session.user === null) {
         return res.redirect(`/sso/login?responseType=${req.query["responseType"]}&clientID=${req.query["clientID"]}&serviceURL=${serviceURL}`);
     }
@@ -25,7 +26,7 @@ const login = (req, res, next) => {
                     .send({ message: "You are not allow to access SSO-Server" });
             }
             if (req.session.user !== undefined) {
-                const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, serviceURL);
+                const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, req.query["clientID"], serviceURL);
                 auth_helper_1.default.storeClientInCache(serviceURL, req.session.user.id, code);
                 // redirect to client with an authorization token
                 return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);

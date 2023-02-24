@@ -13,6 +13,7 @@ const onAuthorized = (req: Request, res: Response, next: NextFunction) => {
   if (req.session.user !== undefined) {
     const code = authHelper.generateAuthorizationCode(
       req.session.user.id,
+      req.query["clientID"] as string,
       serviceURL
     );
     authHelper.storeClientInCache(serviceURL, req.session.user.id, code);
@@ -46,7 +47,14 @@ const onLogin = async (req: Request, res: Response) => {
         authHelper.sessionUser[`${result.userID}`] = result;
 
         // create authorization token
-        const code = authHelper.generateAuthorizationCode(clientID, serviceURL);
+        const code = authHelper.generateAuthorizationCode(
+          result.userID,
+          clientID,
+          serviceURL
+        );
+
+        // save authentication token to database
+
         authHelper.storeClientInCache(serviceURL, `${result.userID}`, code);
 
         // redirect to client with an authorization token
@@ -63,7 +71,6 @@ const onLogin = async (req: Request, res: Response) => {
 };
 
 const onGetToken = (req: Request, res: Response) => {
-  console.log(req.body);
   if (req.body) {
     const { authorizationCode, clientID, clientSecret, serviceURL } = req.body;
 

@@ -35,12 +35,19 @@ const appTokenDB: AppTokenDBType = {
 
 const secretKey = process.env.SECRET_KEY || "up9E5FC6TIwBDHadHAcLA7M3XeilqRfa";
 
-const generateAuthorizationCode = (clientId: string, redirectUrl: string) => {
+const generateAuthorizationCode = (
+  userId: number,
+  clientId: string,
+  serviceUrl: string
+) => {
+  const current = new Date();
+  const expiredTime = current.setMinutes(current.getMinutes() + 15);
   return CryptoJS.AES.encrypt(
     JSON.stringify({
+      userID: userId,
       clientID: clientId,
-      serviceURL: redirectUrl,
-      exp: Date.now() + 600,
+      serviceURL: serviceUrl,
+      exp: expiredTime,
     }),
     secretKey
   ).toString();
