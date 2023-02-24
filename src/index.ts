@@ -1,13 +1,11 @@
 import express, { Express, NextFunction, Request, Response } from "express";
-import session, { Cookie } from "express-session";
+import session, { CookieOptions, SessionOptions } from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import router from "./routers";
 import { insertUser } from "./data/user.db";
 import { initAllModels } from "./data/database";
-import UserModel from "./models/user.model";
-import { SessionType } from "./types/session";
 
 dotenv.config();
 
@@ -15,21 +13,26 @@ const port = process.env.PORT || 3001;
 
 const app: Express = express();
 
-let sessionCookie: Cookie = {
-  secure: false,
-  maxAge: process.env.MAX_AGE as any,
-  originalMaxAge: process.env.MAX_AGE as any,
-};
-
-let sess: SessionType = {
+let sess: SessionOptions = {
   resave: true,
   saveUninitialized: true,
   secret: "secretKey",
-  cookie: sessionCookie,
+  cookie: <CookieOptions>{
+    secure: false,
+    maxAge: process.env.MAX_AGE as any,
+    originalMaxAge: process.env.MAX_AGE as any,
+  },
 };
 if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", 1);
-  sessionCookie.secure = true;
+  sess = {
+    ...sess,
+    cookie: <CookieOptions>{
+      secure: false,
+      maxAge: process.env.MAX_AGE as any,
+      originalMaxAge: process.env.MAX_AGE as any,
+    },
+  };
 }
 
 app.use(express.urlencoded({ extended: true }));
