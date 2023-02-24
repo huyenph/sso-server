@@ -7,4 +7,5 @@ type SessionType = {
 
 type SessionCookieType = {
   secure: boolean;
+  maxAge: number;
 };

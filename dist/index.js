@@ -15,6 +15,7 @@ const port = process.env.PORT || 3001;
 const app = (0, express_1.default)();
 let sessionCookie = {
     secure: false,
+    maxAge: 1000 * 60 * 60 * 24 * 365,
 };
 let sess = {
     resave: true,
@@ -57,8 +58,8 @@ app.listen(port, () => {
     //   username: "Huyen Pham",
     //   password: "123456",
     //   email: "huyenp@gmail.com",
-    //   isActive: false,
-    //   role: "developer",
+    //   isActive: true,
+    //   role: "admin",
     // });
 });
 exports.default = app;

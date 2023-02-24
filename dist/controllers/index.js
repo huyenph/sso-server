@@ -44,7 +44,7 @@ const onAuthorized = (req, res, next) => {
         return res.redirect("/");
     }
     if (req.session.user !== undefined) {
-        const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, serviceURL);
+        const code = auth_helper_1.default.generateAuthorizationCode(req.session.user.id, req.query["clientID"], serviceURL);
         auth_helper_1.default.storeClientInCache(serviceURL, req.session.user.id, code);
         // redirect to client with an authorization token
         return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
@@ -71,7 +71,8 @@ const onLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 req.session.user = Object.assign(Object.assign({}, result), { password: undefined });
                 auth_helper_1.default.sessionUser[`${result.userID}`] = result;
                 // create authorization token
-                const code = auth_helper_1.default.generateAuthorizationCode(clientID, serviceURL);
+                const code = auth_helper_1.default.generateAuthorizationCode(result.userID, clientID, serviceURL);
+                // save authentication token to database
                 auth_helper_1.default.storeClientInCache(serviceURL, `${result.userID}`, code);
                 // redirect to client with an authorization token
                 return res.redirect(302, `${serviceURL}?authorizationCode=${code}`);
