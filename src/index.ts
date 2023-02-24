@@ -6,6 +6,7 @@ import cors from "cors";
 import router from "./routers";
 import { insertUser } from "./data/user.db";
 import { initAllModels } from "./data/database";
+import UserModel from "./models/user.model";
 
 dotenv.config();
 

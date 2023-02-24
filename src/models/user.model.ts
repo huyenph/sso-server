@@ -11,14 +11,14 @@ class UserModel extends Model<
   InferAttributes<UserModel>,
   InferCreationAttributes<UserModel>
 > {
-  declare userID: CreateOptions<number>;
+  declare userID: number;
   declare username: string;
   declare password: string;
   declare email: string;
   declare isActive: boolean;
   declare role: UserRole;
-  declare readonly createdAt?: Date;
-  declare readonly updatedAt?: Date;
+  declare readonly createdAt: Date | null;
+  declare readonly updatedAt: Date | null;
 }
 
 UserModel.init(
@@ -48,6 +48,8 @@ UserModel.init(
       ],
       defaultValue: "user",
     },
+    createdAt: DataTypes.DATE,
+    updatedAt: DataTypes.DATE,
   },
   {
     tableName: "users",
